@@ -2,7 +2,7 @@ namespace GbgMerch.Domain.Entities;
 
 public class Product
 {
-    public Guid Id { get; set; } // Unikt ID för produkten
+    public int Id { get; set; } // Unikt ID för produkten
 
     public string Name { get; set; } = string.Empty; // Produktens namn
 

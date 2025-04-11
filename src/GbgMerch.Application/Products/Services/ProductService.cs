@@ -1,4 +1,3 @@
-using GbgMerch.Application.Common.Interfaces;
 using GbgMerch.Application.DTOs;
 using GbgMerch.Domain.Entities;
 using GbgMerch.Domain.Interfaces;
@@ -30,7 +29,7 @@ public class ProductService : IProductService
         }).ToList();
     }
 
-    public async Task<ProductDto?> GetByIdAsync(Guid id)
+    public async Task<ProductDto?> GetByIdAsync(int id)
     {
         var product = await _repository.GetByIdAsync(id);
         if (product == null) return null;

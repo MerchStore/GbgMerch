@@ -1,3 +1,4 @@
+/*
 using GbgMerch.Domain.Entities;
 using GbgMerch.Domain.Interfaces;
 
@@ -38,10 +39,37 @@ public class InMemoryProductRepository : IProductRepository
         }
     };
 
+    public Task AddAsync(Product product)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task DeleteAsync(int id)
+    {
+        throw new NotImplementedException();
+    }
+
     // Returnerar alla produkter i listan (används i StoreController)
     public Task<List<Product>> GetAllAsync() => Task.FromResult(_products);
 
     // Hämta en enskild produkt baserat på ID
     public Task<Product?> GetByIdAsync(Guid id)
         => Task.FromResult(_products.FirstOrDefault(p => p.Id == id));
+
+    public Task<Product?> GetByIdAsync(int id)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task UpdateAsync(Product product)
+    {
+        throw new NotImplementedException();
+    }
+
+    Task IProductRepository.GetByIdAsync(Guid id)
+    {
+        return GetByIdAsync(id);
+    }
 }
+*/
+
