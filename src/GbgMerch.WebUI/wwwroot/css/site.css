@@ -29,3 +29,18 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+.info-box {
+  background-color: #f8f9fa;
+  padding: 40px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+.margin-top-custom {
+  margin-top: 140px;
+}
+.hero-section {
+  background-color: #f0f4f8; /* ljusblågrå ton */
+  padding: 80px 20px;
+  margin-bottom: 40px;
+}
