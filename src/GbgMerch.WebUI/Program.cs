@@ -1,10 +1,18 @@
-using GbgMerch.Domain.Interfaces;
+using GbgMerch.Infrastructure.Persistence;
 using GbgMerch.Infrastructure.Persistence.Repositories;
+using GbgMerch.Application.Products.Services;
+using GbgMerch.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddScoped<IProductRepository, InMemoryProductRepository>();
+// Registrera DbContext med SQLite
+builder.Services.AddDbContext<ProductDbContext>(options =>
+    options.UseSqlite("Data Source=products.db"));
 
+builder.Services.AddScoped<IProductRepository, EfProductRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
