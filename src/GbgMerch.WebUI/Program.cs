@@ -1,4 +1,10 @@
+using GbgMerch.Domain.Interfaces;
+using GbgMerch.Infrastructure.Persistence.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<IProductRepository, InMemoryProductRepository>();
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
