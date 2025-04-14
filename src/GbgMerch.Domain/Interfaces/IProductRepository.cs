@@ -1,13 +1,13 @@
 using GbgMerch.Domain.Entities;
 
-namespace GbgMerch.Domain.Interfaces;
-
-public interface IProductRepository
+namespace GbgMerch.Domain.Interfaces
 {
-    Task<List<Product>> GetAllAsync();
-        Task<Product?> GetByIdAsync(int id);
+    public interface IProductRepository
+    {
+        Task<List<Product>> GetAllAsync();
+        Task<Product?> GetByIdAsync(Guid id);
         Task AddAsync(Product product);
         Task UpdateAsync(Product product);
-        Task DeleteAsync(int id);
-    Task GetByIdAsync(Guid id);
+        Task DeleteAsync(Guid id);
+    }
 }
