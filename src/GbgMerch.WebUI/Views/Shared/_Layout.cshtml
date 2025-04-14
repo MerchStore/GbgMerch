@@ -24,16 +24,37 @@
                 </button>
                 <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">
-                                <i class="bi bi-house-door"></i> Home
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Store" asp-action="Index">
-                                <i class="bi bi-shop"></i> Store
-                            </a>
-                        </li>
+                        @if (isAdmin && isAdminPage)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="/Admin">
+                                    <i class="bi bi-speedometer2"></i> Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="/Admin/Products">
+                                    <i class="bi bi-box"></i> Products
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" href="/Admin/Orders">
+                                    <i class="bi bi-receipt"></i> Orders
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">
+                                    <i class="bi bi-house-door"></i> Home
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Store" asp-action="Index">
+                                    <i class="bi bi-shop"></i> Store
+                                </a>
+                            </li>
+                        }
                     </ul>
 
                     <ul class="navbar-nav">
