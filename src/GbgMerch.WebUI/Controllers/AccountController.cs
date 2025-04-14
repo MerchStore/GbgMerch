@@ -7,6 +7,14 @@ namespace GbgMerch.WebUI.Controllers
         {
             return View();
         }
+        public IActionResult Logout()
+        {
+            // Tar bort admin-sessionen
+            HttpContext.Session.Remove("IsAdmin");
+
+            // Skickar tillbaka till startsidan
+            return RedirectToAction("Index", "Home");
+        }
 
         [HttpPost]
         public IActionResult Login(string username, string password)
