@@ -8,4 +8,5 @@ public class ProductDto
     public string Description { get; set; } = null!; // Kort beskrivning
     public decimal Price { get; set; }       // Pris
     public string ImageUrl { get; set; } = null!; // Länk till produktbild
+    public int StockQuantity { get; set; } // ✅ Lägg till detta!
 }

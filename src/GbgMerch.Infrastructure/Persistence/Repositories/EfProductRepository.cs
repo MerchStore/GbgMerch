@@ -7,9 +7,9 @@ namespace GbgMerch.Infrastructure.Persistence.Repositories
 {
     public class EfProductRepository : IProductRepository
     {
-        private readonly ProductDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public EfProductRepository(ProductDbContext context)
+        public EfProductRepository(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -19,7 +19,7 @@ namespace GbgMerch.Infrastructure.Persistence.Repositories
             return await _context.Products.ToListAsync();
         }
 
-        public async Task<Product?> GetByIdAsync(int id)
+        public async Task<Product?> GetByIdAsync(Guid id)
         {
             return await _context.Products.FindAsync(id);
         }
@@ -36,7 +36,7 @@ namespace GbgMerch.Infrastructure.Persistence.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(Guid id)
         {
             var product = await _context.Products.FindAsync(id);
             if (product != null)
@@ -44,11 +44,6 @@ namespace GbgMerch.Infrastructure.Persistence.Repositories
                 _context.Products.Remove(product);
                 await _context.SaveChangesAsync();
             }
-        }
-
-        public Task GetByIdAsync(Guid id)
-        {
-            throw new NotImplementedException();
         }
     }
 }
