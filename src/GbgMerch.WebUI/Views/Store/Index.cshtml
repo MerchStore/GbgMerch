@@ -1,33 +1,29 @@
-@model List<GbgMerch.Domain.Entities.Product> 
+@model List<GbgMerch.Domain.Entities.Product>
 
 @{
     ViewData["Title"] = "Store";
 }
 
-<!-- Välkomsttext / intro -->
-<div class="text-center mb-5">
+<div class="text-center mb-6">
     <h1 class="display-4">Welcome to GbgMerch</h1>
     <p class="lead">Discover our high-quality merchandise for developers and tech enthusiasts.</p>
 </div>
 
-<!-- Rubrik till produktlistan -->
-<h2 class="text-3xl font-bold mb-6">Featured Products</h2>
+<h2 class="text-2xl font-bold mb-4">Featured Products</h2>
 
-<!-- Produktkort: visas som grid i olika skärmstorlekar -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
     @foreach (var product in Model)
     {
-        <div class="border rounded-lg shadow p-4">
-            <!-- Produktbild -->
-            <img src="@product.ImageUrl" alt="@product.Name" class="w-full h-40 object-cover mb-2" />
-
-            <!-- Namn och beskrivning -->
-            <h3 class="text-xl font-semibold">@product.Name</h3>
-            <p>@product.Description</p>
-
-            <!-- Pris och lagerstatus -->
-            <p class="font-bold mt-2">SEK @product.Price</p>
-            <p class="text-green-600">In Stock: @product.StockQuantity</p>
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name" />
+                <div class="card-body">
+                    <h5 class="card-title">@product.Name</h5>
+                    <p class="card-text">@product.Description</p>
+                    <p class="fw-bold">SEK @product.Price</p>
+                    <p class="text-success">In Stock: @product.StockQuantity</p>
+                </div>
+            </div>
         </div>
     }
 </div>
