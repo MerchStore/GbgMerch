@@ -31,11 +31,11 @@ public class InMemoryProductRepository : IProductRepository
         new Product 
         {
             Id = Guid.NewGuid(),
-            Name = "Sticker Pack",
-            Description = "5 programming language stickers.",
-            Price = 79.99m,
+            Name = "Hat",
+            Description = "Clo special design hat.",
+            Price = 299.99m,
             StockQuantity = 200,
-            ImageUrl = "/images/stickers.png"
+            ImageUrl = "/images/hat.png"
         }
     };
 
