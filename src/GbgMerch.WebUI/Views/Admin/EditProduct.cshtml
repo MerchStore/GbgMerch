@@ -1,0 +1,78 @@
+@model GbgMerch.Domain.Entities.Product
+@{
+    ViewData["Title"] = "Edit Product";
+}
+
+<div class="card mt-4">
+    <div class="card-header bg-primary text-white">
+        <h2>Edit Product</h2>
+    </div>
+    <div class="card-body">
+        <form asp-action="EditProduct" method="post">
+            <input type="hidden" asp-for="Id" />
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label"></label>
+                        <textarea asp-for="Description" class="form-control"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Image URL</label>
+                        <input asp-for="ImageUrl" class="form-control" />
+                        <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                        <small class="form-text text-muted">Enter a valid URL to an image (optional)</small>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Price</label>
+                        <input name="Price.Amount" value="@Model.Price.Amount" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Currency</label>
+                        <input name="Price.Currency" value="@Model.Price.Currency" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="StockQuantity" class="form-label"></label>
+                        <input asp-for="StockQuantity" class="form-control" />
+                        <span asp-validation-for="StockQuantity" class="text-danger"></span>
+                    </div>
+
+                    @if (Model.ImageUrl != null)
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Current Image</label><br />
+                            <img src="@Model.ImageUrl" alt="Product Image" style="max-height: 200px;" class="img-thumbnail" />
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-3">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Save Changes
+                </button>
+                <a asp-action="ViewProduct" asp-route-id="@Model.Id" class="btn btn-info">
+                    <i class="bi bi-eye"></i> View Details
+                </a>
+                <a asp-action="Products" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
