@@ -1,10 +1,10 @@
 using GbgMerch.Application.DTOs;
 using GbgMerch.Domain.Entities;
 using GbgMerch.Domain.Interfaces;
+using GbgMerch.Domain.ValueObjects;
 
 namespace GbgMerch.Application.Products.Services;
 
-// Tjänstelager för att hantera affärslogik kopplat till produkter
 public class ProductService : IProductService
 {
     private readonly IProductRepository _repository;
@@ -18,30 +18,33 @@ public class ProductService : IProductService
     public async Task<List<ProductDto>> GetAllAsync()
     {
         var products = await _repository.GetAllAsync();
+
         return products.Select(p => new ProductDto
         {
             Id = p.Id,
             Name = p.Name,
             Description = p.Description,
-            Price = p.Price,
-            ImageUrl = p.ImageUrl,
+            Price = p.Price.Amount,
+            Currency = p.Price.Currency,
+            ImageUrl = p.ImageUrl?.ToString() ?? "",
             StockQuantity = p.StockQuantity
         }).ToList();
     }
 
-    // Hämta en produkt med ID
+    // Hämta produkt med ID
     public async Task<ProductDto?> GetByIdAsync(Guid id)
     {
         var product = await _repository.GetByIdAsync(id);
-        if (product == null) return null;
+        if (product is null) return null;
 
         return new ProductDto
         {
             Id = product.Id,
             Name = product.Name,
             Description = product.Description,
-            Price = product.Price,
-            ImageUrl = product.ImageUrl,
+            Price = product.Price.Amount,
+            Currency = product.Price.Currency,
+            ImageUrl = product.ImageUrl?.ToString() ?? "",
             StockQuantity = product.StockQuantity
         };
     }
@@ -49,15 +52,16 @@ public class ProductService : IProductService
     // Lägg till ny produkt
     public async Task AddAsync(ProductDto dto)
     {
-        var product = new Product
-        {
-            Id = 0, // Assuming the database will auto-generate the ID
-            Name = dto.Name,
-            Description = dto.Description,
-            Price = dto.Price,
-            ImageUrl = dto.ImageUrl,
-            StockQuantity = dto.StockQuantity
-        };
+        var price = new Money(dto.Price, dto.Currency);
+        var imageUrl = string.IsNullOrWhiteSpace(dto.ImageUrl) ? null : new Uri(dto.ImageUrl);
+
+        var product = new Product(
+            name: dto.Name,
+            description: dto.Description,
+            imageUrl: imageUrl,
+            price: price,
+            stockQuantity: dto.StockQuantity
+        );
 
         await _repository.AddAsync(product);
     }
@@ -65,15 +69,13 @@ public class ProductService : IProductService
     // Uppdatera produkt
     public async Task UpdateAsync(ProductDto dto)
     {
-        var product = new Product
-        {
-            Id = dto.Id,
-            Name = dto.Name,
-            Description = dto.Description,
-            Price = dto.Price,
-            ImageUrl = dto.ImageUrl,
-            StockQuantity = dto.StockQuantity
-        };
+        var product = await _repository.GetByIdAsync(dto.Id);
+        if (product is null) return;
+
+        product.UpdateDetails(dto.Name, dto.Description,
+            string.IsNullOrWhiteSpace(dto.ImageUrl) ? null : new Uri(dto.ImageUrl));
+        product.UpdatePrice(new Money(dto.Price, dto.Currency));
+        product.UpdateStock(dto.StockQuantity);
 
         await _repository.UpdateAsync(product);
     }
@@ -81,6 +83,10 @@ public class ProductService : IProductService
     // Ta bort produkt
     public async Task DeleteAsync(Guid id)
     {
-        await _repository.DeleteAsync(id);
+        var product = await _repository.GetByIdAsync(id);
+        if (product is not null)
+        {
+            await _repository.RemoveAsync(product);
+        }
     }
 }

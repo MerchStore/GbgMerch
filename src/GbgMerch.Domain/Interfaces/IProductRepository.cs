@@ -1,13 +1,9 @@
 using GbgMerch.Domain.Entities;
 
-namespace GbgMerch.Domain.Interfaces
+namespace GbgMerch.Domain.Interfaces;
+
+// Specifikt interface för produktrelaterade operationer
+public interface IProductRepository : IRepository<Product, Guid>
 {
-    public interface IProductRepository
-    {
-        Task<List<Product>> GetAllAsync();
-        Task<Product?> GetByIdAsync(Guid id);
-        Task AddAsync(Product product);
-        Task UpdateAsync(Product product);
-        Task DeleteAsync(Guid id);
-    }
+    // Extra metodexempel kan läggas till här om nödvändigt i framtiden
 }
