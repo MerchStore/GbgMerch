@@ -1,0 +1,47 @@
+@model GbgMerch.Domain.Entities.Product
+@{
+    ViewData["Title"] = "Product Details";
+}
+
+<div class="card mt-4">
+    <div class="card-header bg-info text-white">
+        <h2>Product Details</h2>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-5 text-center">
+                <img src="@Model.ImageUrl" alt="Product Image" class="img-fluid rounded shadow-sm" style="max-height: 300px;" />
+            </div>
+            <div class="col-md-7">
+                <dl class="row">
+                    <dt class="col-sm-4">Name</dt>
+                    <dd class="col-sm-8">@Model.Name</dd>
+
+                    <dt class="col-sm-4">Description</dt>
+                    <dd class="col-sm-8">@Model.Description</dd>
+
+                    <dt class="col-sm-4">Price</dt>
+                    <dd class="col-sm-8">@Model.Price.Amount.ToString("0.00") @Model.Price.Currency</dd>
+
+                    <dt class="col-sm-4">Stock Quantity</dt>
+                    <dd class="col-sm-8">@Model.StockQuantity</dd>
+
+                    <dt class="col-sm-4">ID</dt>
+                    <dd class="col-sm-8 text-danger">@Model.Id</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="mt-4 d-flex gap-2">
+            <a asp-action="EditProduct" asp-route-id="@Model.Id" class="btn btn-primary">
+                <i class="bi bi-pencil"></i> Edit
+            </a>
+            <a asp-action="DeleteProduct" asp-route-id="@Model.Id" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Delete
+            </a>
+            <a asp-action="Products" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+</div>
