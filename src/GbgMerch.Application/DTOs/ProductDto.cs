@@ -1,12 +1,13 @@
 namespace GbgMerch.Application.DTOs;
 
-// DTO = Data Transfer Object, används för att skicka data mellan lager
+// DTO = Data Transfer Object för produktdata mellan lager
 public class ProductDto
 {
-    public int Id { get; set; }             // Produktens unika ID
-    public string Name { get; set; } = null!; // Produktnamn
-    public string Description { get; set; } = null!; // Kort beskrivning
-    public decimal Price { get; set; }       // Pris
-    public string ImageUrl { get; set; } = null!; // Länk till produktbild
-    public int StockQuantity { get; set; } // ✅ Lägg till detta!
+    public Guid Id { get; set; }             // Produktens unika ID
+    public string Name { get; set; } = "";   // Namn
+    public string Description { get; set; } = ""; // Beskrivning
+    public decimal Price { get; set; }       // Belopp (från Money)
+    public string Currency { get; set; } = "SEK"; // Valuta (från Money)
+    public string ImageUrl { get; set; } = "";    // URL som sträng (från Uri)
+    public int StockQuantity { get; set; }   // Antal i lager
 }
