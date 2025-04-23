@@ -36,8 +36,13 @@
                     <img src="@product.ImageUrl" width="50" height="50" class="rounded shadow-sm" />
                 </td>
                 <td>
-                    <a href="/Admin/Details/@product.Id" class="btn btn-info text-white me-1"><i class="bi bi-eye"></i> View</a>
-                    <a href="/Admin/Edit/@product.Id" class="btn btn-primary me-1"><i class="bi bi-pencil"></i> Edit</a>
+                   <a asp-action="ViewProduct" asp-route-id="@product.Id" class="btn btn-info">
+                         <i class="bi bi-eye"></i> View
+                    </a>
+
+                    <a href="@Url.Action("EditProduct", "Admin", new { id = product.Id })" class="btn btn-primary">
+                        <i class="bi bi-pencil"></i> Edit
+                    </a>
                     <a href="/Admin/Delete/@product.Id" class="btn btn-danger"><i class="bi bi-trash"></i> Delete</a>
                 </td>
             </tr>
