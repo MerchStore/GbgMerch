@@ -12,7 +12,7 @@ public class Product : Entity<Guid>
     public int StockQuantity { get; private set; } = 0;
     public Uri? ImageUrl { get; private set; } = null;
 
-    // Private parameterless constructor for EF Core
+    
     private Product()
     {
         // Required for EF Core, but we don't want it to be used directly
