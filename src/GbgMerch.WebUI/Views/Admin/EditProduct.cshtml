@@ -1,4 +1,4 @@
-@model GbgMerch.Domain.Entities.Product
+@model GbgMerch.WebUI.Models.EditProductViewModel
 @{
     ViewData["Title"] = "Edit Product";
 }
@@ -26,7 +26,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Image URL</label>
+                        <label asp-for="ImageUrl" class="form-label"></label>
                         <input asp-for="ImageUrl" class="form-control" />
                         <span asp-validation-for="ImageUrl" class="text-danger"></span>
                         <small class="form-text text-muted">Enter a valid URL to an image (optional)</small>
@@ -35,12 +35,14 @@
 
                 <div class="col-md-6">
                     <div class="mb-3">
-                        <label class="form-label">Price</label>
-                        <input name="Price.Amount" value="@Model.Price.Amount" class="form-control" />
+                        <label asp-for="PriceAmount" class="form-label"></label>
+                        <input asp-for="PriceAmount" class="form-control" />
+                        <span asp-validation-for="PriceAmount" class="text-danger"></span>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Currency</label>
-                        <input name="Price.Currency" value="@Model.Price.Currency" class="form-control" />
+                        <label asp-for="PriceCurrency" class="form-label"></label>
+                        <input asp-for="PriceCurrency" class="form-control" />
+                        <span asp-validation-for="PriceCurrency" class="text-danger"></span>
                     </div>
                     <div class="mb-3">
                         <label asp-for="StockQuantity" class="form-label"></label>
@@ -48,7 +50,7 @@
                         <span asp-validation-for="StockQuantity" class="text-danger"></span>
                     </div>
 
-                    @if (Model.ImageUrl != null)
+                    @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
                     {
                         <div class="mb-3">
                             <label class="form-label">Current Image</label><br />

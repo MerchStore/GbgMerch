@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using GbgMerch.Domain.Entities;
 using GbgMerch.Domain.Interfaces;
+using GbgMerch.Domain.ValueObjects;
+using GbgMerch.WebUI.Models;
 
 namespace GbgMerch.WebUI.Controllers
 {
@@ -38,10 +40,9 @@ namespace GbgMerch.WebUI.Controllers
             }
 
             var products = await _productRepository.GetAllAsync();
-            return View(products); // Views/Admin/Products.cshtml
+            return View(products);
         }
 
-        // ✅ Visa en enskild produkt
         public async Task<IActionResult> ViewProduct(Guid id)
         {
             if (!IsAdmin())
@@ -53,38 +54,65 @@ namespace GbgMerch.WebUI.Controllers
             var product = await _productRepository.GetByIdAsync(id);
             if (product is null) return NotFound();
 
-            return View("ViewProduct", product); // Views/Admin/ViewProduct.cshtml
+            return View("ViewProduct", product);
         }
 
-        // ✅ GET: Visa produkt för redigering
+        // ✅ GET: Edit
         [HttpGet]
         public async Task<IActionResult> EditProduct(Guid id)
         {
-            if (!IsAdmin())
-            {
-                TempData["Error"] = "Unauthorized access.";
-                return RedirectToAction("Login", "Account");
-            }
+            if (!IsAdmin()) return RedirectToAction("Login", "Account");
 
             var product = await _productRepository.GetByIdAsync(id);
             if (product is null) return NotFound();
 
-            return View("EditProduct", product); // Views/Admin/EditProduct.cshtml
+            var viewModel = new EditProductViewModel
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                ImageUrl = product.ImageUrl?.ToString() ?? "",
+                PriceAmount = product.Price.Amount,
+                PriceCurrency = product.Price.Currency,
+                StockQuantity = product.StockQuantity
+            };
+
+            return View("EditProduct", viewModel);
         }
 
-        // ✅ POST: Uppdatera produkten
+        // ✅ POST: Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-       public async Task<IActionResult> EditProduct(Product updated)
-{
-    if (!IsAdmin()) return RedirectToAction("Login", "Account");
+        public async Task<IActionResult> EditProduct(EditProductViewModel formModel)
+        {
+            if (!IsAdmin()) return RedirectToAction("Login", "Account");
 
-    if (!ModelState.IsValid)
-        return View("EditProduct", updated);
+            if (!ModelState.IsValid)
+                return View("EditProduct", formModel);
 
-    await _productRepository.UpdateAsync(updated);
-    return RedirectToAction("Products");
-}
+            var product = await _productRepository.GetByIdAsync(formModel.Id);
+            if (product is null) return NotFound();
+
+            try
+            {
+                product.UpdateDetails(
+                    formModel.Name,
+                    formModel.Description,
+                    string.IsNullOrWhiteSpace(formModel.ImageUrl) ? null : new Uri(formModel.ImageUrl)
+                );
+
+                product.UpdatePrice(Money.Create(formModel.PriceAmount, formModel.PriceCurrency));
+                product.UpdateStock(formModel.StockQuantity);
+
+                await _productRepository.UpdateAsync(product);
+                return RedirectToAction("Products");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Failed to update product: {ex.Message}");
+                return View("EditProduct", formModel);
+            }
+        }
 
         public IActionResult Orders()
         {
@@ -94,7 +122,7 @@ namespace GbgMerch.WebUI.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            return View(); // Views/Admin/Orders.cshtml
+            return View();
         }
 
         public IActionResult Settings()
@@ -105,7 +133,7 @@ namespace GbgMerch.WebUI.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            return View(); // Views/Admin/Settings.cshtml
+            return View();
         }
     }
 }
