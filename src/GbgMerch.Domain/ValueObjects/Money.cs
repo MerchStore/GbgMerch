@@ -34,6 +34,14 @@ public record Money
         return new Money(left.Amount + right.Amount, left.Currency);
     }
 
+    public static Money Create(decimal amount, string currency)
+{
+    if (string.IsNullOrWhiteSpace(currency))
+        throw new ArgumentException("Currency cannot be empty");
+
+    return new Money(amount, currency.ToUpper());
+}
+
     // Multiply money by a scalar value (e.g., quantity)
     public static Money operator *(Money money, int multiplier)
     {
