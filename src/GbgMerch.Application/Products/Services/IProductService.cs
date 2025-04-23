@@ -1,4 +1,5 @@
-using GbgMerch.Application.DTOs;
+using GbgMerch.Application.DTOs; // Ensure this namespace contains the ProductViewModel class
+
 
 namespace GbgMerch.Application.Products.Services;
 
