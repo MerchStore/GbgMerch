@@ -17,4 +17,15 @@ public class StoreController : Controller
         var products = await _productRepository.GetAllAsync();
         return View(products);
     }
+    public async Task<IActionResult> Details(string id)
+    {
+    if (!Guid.TryParse(id, out Guid guidId))
+        return BadRequest("Ogiltigt ID");
+
+    var product = await _productRepository.GetByIdAsync(guidId);
+
+    return View(product);
+    }
+
+
 }
