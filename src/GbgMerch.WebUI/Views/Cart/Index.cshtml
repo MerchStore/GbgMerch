@@ -1,0 +1,46 @@
+@model List<(GbgMerch.Domain.Entities.Product product, int quantity)>
+
+@{
+    ViewData["Title"] = "Din Kundvagn";
+    decimal total = 0;
+}
+
+<div class="container mt-5">
+    <h2>Kundvagn</h2>
+
+    @if (!Model.Any())
+    {
+        <p>Din kundvagn är tom.</p>
+    }
+    else
+    {
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>Produkt</th>
+                    <th>Antal</th>
+                    <th>Pris</th>
+                    <th>Summa</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    var sum = item.product.Price.Amount * item.quantity;
+                    total += sum;
+
+                    <tr>
+                        <td>@item.product.Name</td>
+                        <td>@item.quantity</td>
+                        <td>@item.product.Price SEK</td>
+                        <td>@sum SEK</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <h4 class="mt-3">Total: <strong>@total SEK</strong></h4>
+
+        <a asp-action="Clear" class="btn btn-primary mt-3">Töm Kundvagnen</a>
+    }
+</div>

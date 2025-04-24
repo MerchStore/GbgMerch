@@ -1,6 +1,7 @@
 using GbgMerch.Infrastructure.Persistence.Seeding;
 using GbgMerch.Infrastructure;
-using GbgMerch.Infrastructure.Persistence.Mongo; // 👈 För MongoDbSeeder
+using GbgMerch.Infrastructure.Persistence.Mongo;
+using GbgMerch.Application.Cart; // 👈 För MongoDbSeeder
 MongoDB.Bson.Serialization.BsonSerializer.RegisterSerializer(
     new MongoDB.Bson.Serialization.Serializers.GuidSerializer(MongoDB.Bson.GuidRepresentation.Standard));
 
@@ -9,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Lägg till Infrastructure-tjänster (Repositories, Mongo etc.)
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddSingleton<ICartService, CartService>();
 
 // Lägg till MVC och session
 builder.Services.AddControllersWithViews();
