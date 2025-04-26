@@ -1,0 +1,31 @@
+@model GbgMerch.Domain.Entities.Product
+
+@{
+    ViewData["Title"] = "Delete Product";
+}
+
+<div class="card mt-4">
+    <div class="card-header bg-danger text-white">
+        <h2>Delete Product</h2>
+    </div>
+    <div class="card-body">
+        <p>Are you sure you want to delete this product?</p>
+
+        <dl class="row">
+            <dt class="col-sm-4">Name</dt>
+            <dd class="col-sm-8">@Model.Name</dd>
+
+            <dt class="col-sm-4">Price</dt>
+            <dd class="col-sm-8">@Model.Price.Amount @Model.Price.Currency</dd>
+
+            <dt class="col-sm-4">Stock</dt>
+            <dd class="col-sm-8">@Model.StockQuantity</dd>
+        </dl>
+
+        <form asp-action="ConfirmDelete" method="post">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button type="submit" class="btn btn-danger">Yes, Delete</button>
+            <a asp-action="Products" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
