@@ -155,4 +155,28 @@ public class AdminController : Controller
         if (!IsAdmin()) return RedirectToAction("Login", "Account");
         return View();
     }
+
+        [HttpGet]
+    public async Task<IActionResult> DeleteProduct(Guid id)
+    {
+        if (!IsAdmin()) return RedirectToAction("Login", "Account");
+
+        var product = await _productRepository.GetByIdAsync(id);
+        if (product is null) return NotFound();
+
+        return View("DeleteProduct", product); // visar en bekräftelsesida
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ConfirmDelete(Guid id)
+    {
+        if (!IsAdmin()) return RedirectToAction("Login", "Account");
+
+        var product = await _productRepository.GetByIdAsync(id);
+        if (product is null) return NotFound();
+
+        await _productRepository.RemoveAsync(product);
+        return RedirectToAction("Products");
+    }
 }
