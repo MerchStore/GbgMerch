@@ -2,138 +2,157 @@ using Microsoft.AspNetCore.Mvc;
 using GbgMerch.Domain.Entities;
 using GbgMerch.Domain.Interfaces;
 using GbgMerch.Domain.ValueObjects;
+using GbgMerch.WebUI.ViewModels; // ✅ Se till att både EditProductViewModel och ProductViewModel finns här
 using GbgMerch.WebUI.Models;
 
-namespace GbgMerch.WebUI.Controllers
+namespace GbgMerch.WebUI.Controllers;
+
+public class AdminController : Controller
 {
-    public class AdminController : Controller
+    private readonly IProductRepository _productRepository;
+
+    public AdminController(IProductRepository productRepository)
     {
-        private readonly IProductRepository _productRepository;
+        _productRepository = productRepository;
+    }
 
-        public AdminController(IProductRepository productRepository)
+    private bool IsAdmin()
+    {
+        return HttpContext.Session.GetString("IsAdmin") == "true";
+    }
+
+    public IActionResult Index()
+    {
+        if (!IsAdmin())
         {
-            _productRepository = productRepository;
+            TempData["Error"] = "You must be an admin to access the dashboard.";
+            return RedirectToAction("Login", "Account");
         }
 
-        private bool IsAdmin()
+        return View("Dashboard");
+    }
+
+    public async Task<IActionResult> Products()
+    {
+        if (!IsAdmin()) return RedirectToAction("Login", "Account");
+
+        var products = await _productRepository.GetAllAsync();
+        return View(products);
+    }
+
+    public async Task<IActionResult> ViewProduct(Guid id)
+    {
+        if (!IsAdmin()) return RedirectToAction("Login", "Account");
+
+        var product = await _productRepository.GetByIdAsync(id);
+        if (product is null) return NotFound();
+
+        return View("ViewProduct", product);
+    }
+
+    // 🛠️ CREATE
+    [HttpGet]
+    public IActionResult Create()
+    {
+        if (!IsAdmin()) return RedirectToAction("Login", "Account");
+        return View("Create");
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(CreateProductViewModel model)
+    {
+        if (!IsAdmin()) return RedirectToAction("Login", "Account");
+
+        if (!ModelState.IsValid)
+            return View("CreateProduct", model);
+
+        try
         {
-            return HttpContext.Session.GetString("IsAdmin") == "true";
-        }
+            var product = new Product(
+                name: model.Name,
+                description: model.Description,
+                imageUrl: string.IsNullOrWhiteSpace(model.ImageUrl) ? null : new Uri(model.ImageUrl),
+                price: Money.Create(model.PriceAmount, model.PriceCurrency),
+                stockQuantity: model.StockQuantity
+            );
 
-        public IActionResult Index()
+            await _productRepository.AddAsync(product);
+            return RedirectToAction("Products");
+        }
+        catch (Exception ex)
         {
-            if (!IsAdmin())
-            {
-                TempData["Error"] = "You must be an admin to access the dashboard.";
-                return RedirectToAction("Login", "Account");
-            }
-
-            return View("Dashboard");
+            ModelState.AddModelError(string.Empty, "Could not create product: " + ex.Message);
+            return View("CreateProduct", model);
         }
+    }
 
-        public async Task<IActionResult> Products()
+
+    // 🛠️ EDIT
+    [HttpGet]
+    public async Task<IActionResult> EditProduct(Guid id)
+    {
+        if (!IsAdmin()) return RedirectToAction("Login", "Account");
+
+        var product = await _productRepository.GetByIdAsync(id);
+        if (product is null) return NotFound();
+
+        var viewModel = new EditProductViewModel
         {
-            if (!IsAdmin())
-            {
-                TempData["Error"] = "Unauthorized access.";
-                return RedirectToAction("Login", "Account");
-            }
+            Id = product.Id,
+            Name = product.Name,
+            Description = product.Description,
+            ImageUrl = product.ImageUrl?.ToString() ?? "",
+            PriceAmount = product.Price.Amount,
+            PriceCurrency = product.Price.Currency,
+            StockQuantity = product.StockQuantity
+        };
 
-            var products = await _productRepository.GetAllAsync();
-            return View(products);
-        }
+        return View("EditProduct", viewModel);
+    }
 
-        public async Task<IActionResult> ViewProduct(Guid id)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditProduct(EditProductViewModel formModel)
+    {
+        if (!IsAdmin()) return RedirectToAction("Login", "Account");
+
+        if (!ModelState.IsValid)
+            return View("EditProduct", formModel);
+
+        var product = await _productRepository.GetByIdAsync(formModel.Id);
+        if (product is null) return NotFound();
+
+        try
         {
-            if (!IsAdmin())
-            {
-                TempData["Error"] = "Unauthorized access.";
-                return RedirectToAction("Login", "Account");
-            }
+            product.UpdateDetails(
+                formModel.Name,
+                formModel.Description,
+                string.IsNullOrWhiteSpace(formModel.ImageUrl) ? null : new Uri(formModel.ImageUrl)
+            );
 
-            var product = await _productRepository.GetByIdAsync(id);
-            if (product is null) return NotFound();
+            product.UpdatePrice(Money.Create(formModel.PriceAmount, formModel.PriceCurrency));
+            product.UpdateStock(formModel.StockQuantity);
 
-            return View("ViewProduct", product);
+            await _productRepository.UpdateAsync(product);
+            return RedirectToAction("Products");
         }
-
-        // ✅ GET: Edit
-        [HttpGet]
-        public async Task<IActionResult> EditProduct(Guid id)
+        catch (Exception ex)
         {
-            if (!IsAdmin()) return RedirectToAction("Login", "Account");
-
-            var product = await _productRepository.GetByIdAsync(id);
-            if (product is null) return NotFound();
-
-            var viewModel = new EditProductViewModel
-            {
-                Id = product.Id,
-                Name = product.Name,
-                Description = product.Description,
-                ImageUrl = product.ImageUrl?.ToString() ?? "",
-                PriceAmount = product.Price.Amount,
-                PriceCurrency = product.Price.Currency,
-                StockQuantity = product.StockQuantity
-            };
-
-            return View("EditProduct", viewModel);
+            ModelState.AddModelError("", $"Failed to update product: {ex.Message}");
+            return View("EditProduct", formModel);
         }
+    }
 
-        // ✅ POST: Edit
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditProduct(EditProductViewModel formModel)
-        {
-            if (!IsAdmin()) return RedirectToAction("Login", "Account");
+    public IActionResult Orders()
+    {
+        if (!IsAdmin()) return RedirectToAction("Login", "Account");
+        return View();
+    }
 
-            if (!ModelState.IsValid)
-                return View("EditProduct", formModel);
-
-            var product = await _productRepository.GetByIdAsync(formModel.Id);
-            if (product is null) return NotFound();
-
-            try
-            {
-                product.UpdateDetails(
-                    formModel.Name,
-                    formModel.Description,
-                    string.IsNullOrWhiteSpace(formModel.ImageUrl) ? null : new Uri(formModel.ImageUrl)
-                );
-
-                product.UpdatePrice(Money.Create(formModel.PriceAmount, formModel.PriceCurrency));
-                product.UpdateStock(formModel.StockQuantity);
-
-                await _productRepository.UpdateAsync(product);
-                return RedirectToAction("Products");
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", $"Failed to update product: {ex.Message}");
-                return View("EditProduct", formModel);
-            }
-        }
-
-        public IActionResult Orders()
-        {
-            if (!IsAdmin())
-            {
-                TempData["Error"] = "Unauthorized access.";
-                return RedirectToAction("Login", "Account");
-            }
-
-            return View();
-        }
-
-        public IActionResult Settings()
-        {
-            if (!IsAdmin())
-            {
-                TempData["Error"] = "Unauthorized access.";
-                return RedirectToAction("Login", "Account");
-            }
-
-            return View();
-        }
+    public IActionResult Settings()
+    {
+        if (!IsAdmin()) return RedirectToAction("Login", "Account");
+        return View();
     }
 }
