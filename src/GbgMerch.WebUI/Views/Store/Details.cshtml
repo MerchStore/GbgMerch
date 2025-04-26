@@ -15,8 +15,14 @@
                 <p class="mt-3">@Model.Description</p>
                 <p><strong>Pris:</strong> @Model.Price</p>
                 <p><strong>Lagerstatus:</strong> @Model.StockQuantity</p>
+            <div class="d-flex gap-2 mt-4">
+                <a class="btn btn-primary" asp-action="Index">Back to Products</a>
 
-                <a class="btn btn-primary mt-4" asp-action="Index">Tillbaka</a>
+                <form asp-controller="Cart" asp-action="AddToCart" method="post" class="d-flex align-items-center gap-2">
+                    <input type="hidden" name="productId" value="@Model.Id" />
+                    <input type="number" name="quantity" value="1" min="1" class="form-control" style="width: 80px;" />
+                    <button type="submit" class="btn btn-success">Add to Cart</button>
+                </form>
             </div>
         </div>
     </div>
