@@ -1,0 +1,83 @@
+@model List<(GbgMerch.Domain.Entities.Product product, int quantity)>
+
+@{
+    ViewData["Title"] = "Checkout";
+    decimal total = 0;
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4">Checkout</h2>
+
+    <form method="post" asp-action="PlaceOrder">
+        <div class="row">
+            <!-- Kundinformation -->
+            <div class="col-md-6">
+                <h4>Customer Information</h4>
+                <div class="mb-3">
+                    <label>Full Name</label>
+                    <input class="form-control" name="FullName" required />
+                </div>
+                <div class="mb-3">
+                    <label>Email Address</label>
+                    <input type="email" class="form-control" name="Email" required />
+                </div>
+
+                <h4 class="mt-4">Shipping Address</h4>
+                <div class="mb-3">
+                    <label>Street Address</label>
+                    <input class="form-control" name="Street" required />
+                </div>
+                <div class="mb-3">
+                    <label>City</label>
+                    <input class="form-control" name="City" required />
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Postal Code</label>
+                        <input class="form-control" name="PostalCode" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Country</label>
+                        <input class="form-control" name="Country" required />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orderöversikt -->
+            <div class="col-md-6">
+                <h4>Order Summary</h4>
+                <table class="table">
+                    @foreach (var item in Model)
+                    {
+                        var sum = item.product.Price.Amount * item.quantity;
+                        total += sum;
+                        <tr>
+                            <td>@item.product.Name <br /><small>x @item.quantity</small></td>
+                            <td class="text-end">@sum.ToString("0.00") SEK</td>
+                        </tr>
+                    }
+                    <tr>
+                        <td><strong>Total:</strong></td>
+                        <td class="text-end fw-bold">@total.ToString("0.00") SEK</td>
+                    </tr>
+                </table>
+
+                <div class="text-end">
+                    <a asp-action="Index" class="btn btn-outline-secondary me-2">Back to Cart</a>
+                    <button type="submit" class="btn btn-primary">Place Order</button>
+                </div>
+
+                <!-- Betalningslogotyper -->
+                <div class="text-center mt-4">
+                    <strong class="text-muted d-block mb-3" style="font-size: 1rem;">PAYMENTS</strong>
+                    <div class="d-flex justify-content-center align-items-center gap-4">
+                    <img src="/images/payments/bitcoin.jpg" height="30" class="mx-1" />
+                    <img src="/images/payments/visa.png" height="30" class="mx-1" />
+                    <img src="/images/payments/mastercard.jpg" height="30" class="mx-1" />
+                    <img src="/images/payments/klarna.png" height="30" class="mx-1" />
+                    <img src="/images/payments/paypal.png" height="30" class="mx-1" />
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

@@ -7,5 +7,6 @@ namespace GbgMerch.Application.Cart
         void AddToCart(Product product, int quantity);
         List<(Product product, int quantity)> GetCartItems();
         void ClearCart();
+        void UpdateQuantity(Guid productId, int change);
     }
 }

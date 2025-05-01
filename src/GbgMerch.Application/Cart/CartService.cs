@@ -5,29 +5,46 @@ namespace GbgMerch.Application.Cart
     public class CartService : ICartService
     {
         private readonly List<(Product product, int quantity)> _item = new();
+        private readonly Dictionary<Guid, (Product Product, int Quantity)> _items = new();
 
         public void AddToCart(Product product, int quantity)
         {
-            for (int i = 0; i < _item.Count; i++)
+            if (_items.ContainsKey(product.Id))
             {
-                if (_item[i].product.Id == product.Id)
-                {
-                    _item[i] = (_item[i].product, _item[i].quantity + quantity);
-                    return;
-                }
+                var current = _items[product.Id];
+                _items[product.Id] = (current.Product, current.Quantity + quantity);
             }
-
-            _item.Add((product, quantity));
+            else
+            {
+                _items[product.Id] = (product, quantity);
+            }
         }
+
+        public void UpdateQuantity(Guid productId, int change)
+        {
+            if (_items.ContainsKey(productId))
+            {
+                var current = _items[productId];
+                var newQuantity = current.Quantity + change;
+
+                if (newQuantity <= 0)
+                    _items.Remove(productId);
+                else
+                    _items[productId] = (current.Product, newQuantity);
+            }
+        }
+
+
 
         public List<(Product product, int quantity)> GetCartItems()
         {
-            return _item;
+            return _items.Values.Select(x => (x.Product, x.Quantity)).ToList();
         }
+
 
         public void ClearCart()
         {
-            _item.Clear();
+            _items.Clear();
         }
     }
 }
