@@ -33,10 +33,10 @@
         </div>
     </div>
 </div>
-<script>
-    document.querySelectorAll('.add-to-cart-form').forEach(form => {
-        form.addEventListener('submit', async function (event) {
-            event.preventDefault(); // Stoppar vanlig reload
+@section Scripts {
+    <script>
+        document.getElementById('add-to-cart-form')?.addEventListener('submit', async function (event) {
+            event.preventDefault();
 
             const formData = new FormData(this);
 
@@ -46,16 +46,20 @@
             });
 
             if (response.ok) {
-                // Visa alert
                 alert('Product has been added to the cart!');
 
-                // Hämta badge och uppdatera siffran
-                const cartCountElement = document.getElementById('cart-count');
-                let currentCount = parseInt(cartCountElement.textContent) || 0;
-                cartCountElement.textContent = currentCount + 1;
+                const countResponse = await fetch('/Cart/GetCartCount');
+                if (countResponse.ok) {
+                    const count = await countResponse.json();
+                    const cartCountElement = document.getElementById('cart-count');
+                    if (cartCountElement) {
+                        cartCountElement.textContent = count;
+                        cartCountElement.style.display = count > 0 ? 'inline-block' : 'none';
+                    }
+                }
             } else {
-                alert('Server error when adding to cart.');
+                alert('Failed to add product.');
             }
         });
-    });
-</script>
+    </script>
+}

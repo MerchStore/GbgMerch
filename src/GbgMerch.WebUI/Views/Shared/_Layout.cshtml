@@ -96,12 +96,13 @@
                                 </a>
                             </li>
                         }
-
-                        <li class="nav-item"></li>
-                            <a class="nav-link text-dark" href="/Cart">
-                                <i class="bi bi-cart"></i>
+                        <li class="nav-item position-relative">
+                            <a class="nav-link" asp-controller="Cart" asp-action="Index">
+                                <i class="bi bi-cart" style="font-size: 1rem;"></i>
+                                @await Component.InvokeAsync("CartCount")
                             </a>
                         </li>
+
                     </ul>
                 </div>
             </div>
