@@ -23,31 +23,37 @@
                     <p class="fw-bold">SEK @product.Price</p>
                     <p class="text-success">In Stock: @product.StockQuantity</p>
 
-                   <div class="mt-auto d-flex gap-2 justify-content-center">
-                    <!-- View Details-knapp -->
-                    <a class="btn btn-primary rounded-pill px-3 py-1 d-flex align-items-center gap-2"
-                    style="font-size: 1rem;" 
-                    asp-controller="Store" asp-action="Details" asp-route-id="@product.Id">
-                        <i class="bi bi-eye"></i> View Details
-                    </a>
+                    <div class="mt-auto d-flex gap-2 justify-content-center">
+                        <!-- View Details -->
+                        <a class="btn btn-primary rounded-pill px-3 py-1 d-flex align-items-center gap-2"
+                           style="font-size: 1rem;" 
+                           asp-controller="Store" asp-action="Details" asp-route-id="@product.Id">
+                            <i class="bi bi-eye"></i> View Details
+                        </a>
 
-                    <!-- Add to Cart-knapp -->
-                    <form method="post" asp-controller="Cart" asp-action="AddToCart" asp-route-productId="@product.Id" asp-route-quantity="1" class="add-to-cart-form">
-                        <button type="submit" class="btn btn-primary rounded-pill px-4 py-2">
-                            <i class="bi bi-cart"></i> Add to Cart
-                        </button>
-                    </form>
-
-                </div>
+                        <!-- Add to Cart -->
+                        <form method="post"
+                              asp-controller="Cart"
+                              asp-action="AddToCart"
+                              asp-route-productId="@product.Id"
+                              asp-route-quantity="1"
+                              class="add-to-cart-form">
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 py-2">
+                                <i class="bi bi-cart"></i> Add to Cart
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     }
 </div>
+
+<!-- JavaScript för AJAX Cart -->
 <script>
     document.querySelectorAll('.add-to-cart-form').forEach(form => {
         form.addEventListener('submit', async function (event) {
-            event.preventDefault(); // Stoppar vanlig form reload
+            event.preventDefault();
 
             const formData = new FormData(this);
 
@@ -57,17 +63,21 @@
             });
 
             if (response.ok) {
-                // Visa alert
                 alert('Product has been added to the cart!');
 
-                // Uppdatera cart-count
-                const cartCountElement = document.getElementById('cart-count');
-                let currentCount = parseInt(cartCountElement.textContent) || 0;
-                cartCountElement.textContent = currentCount + 1;
+                // Hämta cart count från servern
+                const countResponse = await fetch('/Cart/GetCartCount');
+                if (countResponse.ok) {
+                    const count = await countResponse.json();
+                    const cartCountElement = document.getElementById('cart-count');
+                    if (cartCountElement) {
+                        cartCountElement.textContent = count;
+                        cartCountElement.style.display = count > 0 ? 'inline-block' : 'none';
+                    }
+                }
             } else {
                 alert('Server error when adding to cart.');
             }
         });
     });
 </script>
-
