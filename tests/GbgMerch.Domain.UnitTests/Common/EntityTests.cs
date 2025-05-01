@@ -89,4 +89,5 @@ public class EntityTests
         // Act & Assert
         Assert.Equal(entity1.GetHashCode(), entity2.GetHashCode());
     }
+    
 }

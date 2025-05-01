@@ -1,7 +1,7 @@
 using GbgMerch.Domain.Entities;
 using GbgMerch.Domain.ValueObjects;
 
-namespace MerchStore.Domain.UnitTests.Entities;
+namespace GbgMerch.Domain.UnitTests.Entities;
 
 public class ProductTests
 {
