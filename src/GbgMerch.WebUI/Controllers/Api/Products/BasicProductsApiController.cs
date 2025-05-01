@@ -1,14 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
 using GbgMerch.Domain.Interfaces;
+using GbgMerch.WebUI.Controllers.Api.Products;
 using GbgMerch.WebUI.ViewModels.Api.Basic;
+using Microsoft.AspNetCore.Authorization; // ✅ Nödvändigt för [Authorize]
+
 
 namespace GbgMerch.WebUI.Controllers.Api.Products;
 
+[Authorize(Policy = "ApiKeyPolicy")] 
 [ApiController]
 [Route("api/basic/products")]
 public class BasicProductsApiController : ControllerBase
 {
     private readonly IProductRepository _productRepository;
+    
 
     public BasicProductsApiController(IProductRepository productRepository)
     {
