@@ -16,14 +16,46 @@
                 <p><strong>Pris:</strong> @Model.Price</p>
                 <p><strong>Lagerstatus:</strong> @Model.StockQuantity</p>
             <div class="d-flex gap-2 mt-4">
-                <a class="btn btn-primary" asp-action="Index">Back to Products</a>
+                <a class="btn btn-primary px-4 py-2 d-flex align-items-center gap-2 rounded-pill" asp-action="Index">
+                    <i class="bi bi-arrow-left"></i> Back to Products
+                </a>
 
-                <form asp-controller="Cart" asp-action="AddToCart" method="post" class="d-flex align-items-center gap-2">
+
+                <form asp-controller="Cart" asp-action="AddToCart" method="post" class="d-flex align-items-center gap-2 add-to-cart-form">
                     <input type="hidden" name="productId" value="@Model.Id" />
-                    <input type="number" name="quantity" value="1" min="1" class="form-control" style="width: 80px;" />
-                    <button type="submit" class="btn btn-success">Add to Cart</button>
+                    <input type="number" name="quantity" value="1" min="1" class="form-control rounded-pill" style="width: 80px;" />
+                    <button type="submit" class="btn btn-primary px-4 py-2 d-flex align-items-center gap-2 rounded-pill">
+                        <i class="bi bi-cart"></i> Add to Cart
+                    </button>
                 </form>
+
             </div>
         </div>
     </div>
 </div>
+<script>
+    document.querySelectorAll('.add-to-cart-form').forEach(form => {
+        form.addEventListener('submit', async function (event) {
+            event.preventDefault(); // Stoppar vanlig reload
+
+            const formData = new FormData(this);
+
+            const response = await fetch(this.action, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                // Visa alert
+                alert('Product has been added to the cart!');
+
+                // Hämta badge och uppdatera siffran
+                const cartCountElement = document.getElementById('cart-count');
+                let currentCount = parseInt(cartCountElement.textContent) || 0;
+                cartCountElement.textContent = currentCount + 1;
+            } else {
+                alert('Server error when adding to cart.');
+            }
+        });
+    });
+</script>
