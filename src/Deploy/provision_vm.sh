@@ -10,6 +10,11 @@ app_port=8080
 workspace_name="GbgMerchLogs"
 image="ghcr.io/merchstore/gbgmerch:latest"
 
+# 🧑‍💻 GHCR-autentiseringsuppgifter (måste exporteras innan scriptet körs)
+registry_server="ghcr.io"
+registry_username="${GHCR_USERNAME:?GHCR_USERNAME måste vara satt}"
+registry_password="${GHCR_PAT:?GHCR_PAT måste vara satt}"
+
 echo "🔐 Registrerar Log Analytics-provider om det behövs..."
 az provider register -n Microsoft.OperationalInsights --wait
 
@@ -67,4 +72,7 @@ az containerapp create \
   --environment "$env_name" \
   --target-port "$app_port" \
   --ingress external \
+  --registry-server "$registry_server" \
+  --registry-username "$registry_username" \
+  --registry-password "$registry_password" \
   --query properties.configuration.ingress.fqdn
