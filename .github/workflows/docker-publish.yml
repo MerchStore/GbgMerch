@@ -1,0 +1,61 @@
+name: Build & Deploy GbgMerch to Azure Container Apps
+
+on:
+  push:
+    branches:
+      - dev  # Körs på push till dev-branchen
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ghcr.io/merchstore/gbgmerch
+  AZURE_RESOURCE_GROUP: GbgMerchRG
+  AZURE_CONTAINERAPP_NAME: gbgmerch
+
+jobs:
+  build-and-push:
+    name: 🐳 Build & Push Docker Image
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: ✅ Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔐 Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: ⚙️ Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 📦 Build and Push Docker Image to GHCR
+        uses: docker/build-push-action@v5
+        with:
+          context: ./src
+          file: ./src/GbgMerch.WebUI/Dockerfile
+          push: true
+          tags: ${{ env.IMAGE_NAME }}:latest
+
+  deploy-to-azure:
+    name: 🚀 Deploy to Azure Container App
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🔐 Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: 🚀 Deploy Latest Image to Azure Container App
+        run: |
+          az containerapp update \
+            --name "${{ env.AZURE_CONTAINERAPP_NAME }}" \
+            --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
+            --image "${{ env.IMAGE_NAME }}:latest"
