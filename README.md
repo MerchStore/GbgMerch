@@ -1,2 +1,3 @@
 # GbgMerch
-//Testing
+//Testing!
+Mr Amir trader
