@@ -32,9 +32,19 @@ builder.Services.AddSession();
 //
 builder.Services.Configure<ApiKeySettings>(builder.Configuration.GetSection("ApiKeySettings"));
 
+// 🧠 Läs in ApiKey från appsettings.json
+var apiKeySettings = builder.Configuration.GetSection("ApiKeySettings").Get<ApiKeySettings>()
+                       ?? throw new InvalidOperationException("ApiKeySettings is missing in configuration.");
+
+
 builder.Services.AddAuthentication(ApiKeyAuthenticationDefaults.AuthenticationScheme)
     .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(
-        ApiKeyAuthenticationDefaults.AuthenticationScheme, options => { });
+        ApiKeyAuthenticationDefaults.AuthenticationScheme, options =>
+        {
+            options.ApiKey = apiKeySettings.ApiKey;
+            options.HeaderName = ApiKeyAuthenticationDefaults.HeaderName;
+        });
+
 
 builder.Services.AddAuthorization(options =>
 {
