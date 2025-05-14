@@ -13,7 +13,13 @@ public class ConfigureApiKeyAuthenticationOptions : IConfigureOptions<ApiKeyAuth
 
     public void Configure(ApiKeyAuthenticationOptions options)
     {
-        options.ApiKey = _configuration["ApiKeySettings:ApiKey"];
-        options.HeaderName = "X-API-Key"; // Om du vill ha det statiskt här
+        // 🟡 HÄR placeras den
+        options.ApiKey = _configuration["ApiKeySettings:ApiKey"] ?? string.Empty;
+
+        // 🔐 HeaderName (kan tas från config också om du vill)
+        options.HeaderName = "X-API-Key";
+
+        // 💡 Valfri debug-logg (kan tas bort senare)
+        Console.WriteLine($"🔐 [DEBUG] Loaded API key from config: {options.ApiKey}");
     }
 }
