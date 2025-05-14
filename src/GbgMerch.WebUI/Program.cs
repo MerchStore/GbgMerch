@@ -27,7 +27,6 @@ builder.Services.AddSingleton<ICartService, CartService>();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 
-//
 // 💳 API-key authentication
 //
 builder.Services.Configure<ApiKeySettings>(builder.Configuration.GetSection("ApiKeySettings"));
@@ -36,6 +35,8 @@ builder.Services.Configure<ApiKeySettings>(builder.Configuration.GetSection("Api
 var apiKeySettings = builder.Configuration.GetSection("ApiKeySettings").Get<ApiKeySettings>()
                        ?? throw new InvalidOperationException("ApiKeySettings is missing in configuration.");
 
+
+builder.Services.ConfigureOptions<ConfigureApiKeyAuthenticationOptions>();
 
 builder.Services.AddAuthentication(ApiKeyAuthenticationDefaults.AuthenticationScheme)
     .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(
