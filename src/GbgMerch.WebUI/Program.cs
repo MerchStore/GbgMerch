@@ -92,15 +92,33 @@ builder.Services.AddSwaggerGen(options =>
         options.IncludeXmlComments(xmlPath);
     }
 
+    // 🔐 API-nyckel setup för Swagger UI
     options.AddSecurityDefinition(ApiKeyAuthenticationDefaults.AuthenticationScheme, new OpenApiSecurityScheme
     {
         Description = "Ange din API-nyckel i headern",
-        Name = ApiKeyAuthenticationDefaults.HeaderName,
+        Name = ApiKeyAuthenticationDefaults.HeaderName, // "X-API-Key"
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
         Scheme = ApiKeyAuthenticationDefaults.AuthenticationScheme
     });
 
+    // ✅ Lägg till detta block (DETTA visar 🔒-knappen i Swagger UI)
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = ApiKeyAuthenticationDefaults.AuthenticationScheme
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+
+    // 👇 Endast nödvändigt om du har en custom OperationFilter (t.ex. för kommentarer)
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
