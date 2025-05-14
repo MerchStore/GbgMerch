@@ -32,6 +32,8 @@ builder.Services.AddSession();
 //
 builder.Services.Configure<ApiKeySettings>(builder.Configuration.GetSection("ApiKeySettings"));
 
+builder.Services.ConfigureOptions<ConfigureApiKeyAuthenticationOptions>();
+
 builder.Services.AddAuthentication(ApiKeyAuthenticationDefaults.AuthenticationScheme)
     .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(
         ApiKeyAuthenticationDefaults.AuthenticationScheme, options => { });
