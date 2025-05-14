@@ -27,7 +27,6 @@ builder.Services.AddSingleton<ICartService, CartService>();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 
-//
 // 💳 API-key authentication
 //
 builder.Services.Configure<ApiKeySettings>(builder.Configuration.GetSection("ApiKeySettings"));
