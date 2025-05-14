@@ -117,18 +117,22 @@ if (app.Environment.IsDevelopment())
     using var scope = app.Services.CreateScope();
     var seeder = scope.ServiceProvider.GetRequiredService<MongoDbSeeder>();
     await seeder.SeedAsync();
-
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "GbgMerch API V1");
-    });
 }
-else
+
+// Swagger alltid aktivt
+app.UseSwagger();
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "GbgMerch API V1");
+    options.RoutePrefix = "swagger"; // Detta gör att /swagger fungerar
+});
+
+if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
 
 //
 // 🧭 Middleware pipeline
