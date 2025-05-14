@@ -1,6 +1,6 @@
 // Configuration
 const API_CONFIG = {
-    baseUrl: 'http://localhost:5173',  // Update with your API's URL
+    baseUrl: 'https://gbgmerch.mangopebble-f6036b59.northeurope.azurecontainerapps.io/',  // Update with your API's URL
     endpoints: {
         products: '/api/basic/products'
     },
