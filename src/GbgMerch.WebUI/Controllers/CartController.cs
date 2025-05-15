@@ -1,5 +1,7 @@
 using GbgMerch.Application.Cart;
+using GbgMerch.Domain.Entities;
 using GbgMerch.Domain.Interfaces;
+using GbgMerch.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GbgMerch.WebUI.Controllers
@@ -8,11 +10,13 @@ namespace GbgMerch.WebUI.Controllers
     {
         private readonly ICartService _cartService;
         private readonly IProductRepository _productRepository;
+        private readonly OrderRepository _orderRepository;
 
-        public CartController(ICartService cartService, IProductRepository productRepository)
+        public CartController(ICartService cartService, IProductRepository productRepository, OrderRepository orderRepository)
         {
             _cartService = cartService;
             _productRepository = productRepository;
+            _orderRepository = orderRepository;
         }
         [HttpPost]
         public async Task<IActionResult> AddToCart(Guid productId, int quantity)
@@ -36,16 +40,46 @@ namespace GbgMerch.WebUI.Controllers
             _cartService.ClearCart();
             return RedirectToAction("Index");
         }
+        
         [HttpPost]
-        public IActionResult PlaceOrder(string FullName, string Email, string Street, string City, string PostalCode, string Country)
+        public async Task<IActionResult> PlaceOrder(string FullName, string Email, string Street, string City, string PostalCode, string Country)
         {
-            // I framtiden kan du spara ordern i databasen här
+            var cart = _cartService.GetCartItems();
+
+            var orderItems = cart.Select(item => new OrderItem
+            {
+                ProductName = item.product.Name,
+                Quantity = item.quantity,
+                UnitPrice = item.product.Price.Amount
+            }).ToList();
+
+            var total = orderItems.Sum(i => i.UnitPrice * i.Quantity);
+
+            var order = new Order(
+                FullName,
+                Email,
+                "Received",
+                orderItems,
+                total,
+                Street,
+                City,
+                PostalCode,
+                Country
+            );
+
+            // 🟡 Lägg till dessa loggar:
+            Console.WriteLine("📦 Försöker spara order till MongoDB...");
+            await _orderRepository.SaveAsync(order);
+            Console.WriteLine("✅ Order skickad till MongoDB!");
+
             _cartService.ClearCart();
 
             TempData["OrderMessage"] = $"Tack för din beställning, {FullName}! Vi skickar till {Street}, {PostalCode} {City}, {Country}.";
 
             return RedirectToAction("Confirmation");
         }
+
+
         public IActionResult Confirmation()
         {
             return View();

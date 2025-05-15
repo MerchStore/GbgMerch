@@ -1,0 +1,58 @@
+@model GbgMerch.Domain.Entities.Order
+
+<h2>Order Details</h2>
+
+<hr />
+
+<h4><strong>Order ID:</strong> @Model.Id</h4>
+<form asp-action="UpdateOrderStatus" method="post" class="d-flex align-items-center mb-3">
+    <input type="hidden" name="id" value="@Model.Id" />
+    <select name="newStatus" class="form-select me-2" style="width: 200px;">
+        <option value="Created" selected="@(Model.Status == "Created")">Created</option>
+        <option value="Processing" selected="@(Model.Status == "Processing")">Processing</option>
+        <option value="Delivered" selected="@(Model.Status == "Delivered")">Delivered</option>
+        <option value="Cancelled" selected="@(Model.Status == "Cancelled")">Cancelled</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Update</button>
+</form>
+
+
+<h4>Customer Info</h4>
+<ul>
+    <li><strong>Name:</strong> @Model.CustomerName</li>
+    <li><strong>Email:</strong> @Model.CustomerEmail</li>
+    <h5>Shipping Address</h5>
+<ul>
+    <li><strong>Street:</strong> @Model.ShippingStreet</li>
+    <li><strong>City:</strong> @Model.ShippingCity</li>
+    <li><strong>Postal Code:</strong> @Model.ShippingPostalCode</li>
+    <li><strong>Country:</strong> @Model.ShippingCountry</li>
+</ul>
+
+</ul>
+<h4>Items</h4>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>@item.ProductName</td>
+                <td>@item.Quantity</td>
+                <td>@item.UnitPrice SEK</td>
+                <td>@(item.UnitPrice * item.Quantity) SEK</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h5>Total: <strong>@Model.TotalAmount SEK</strong></h5>
+
+<a asp-action="Orders" class="btn btn-secondary mt-3">← Back to Order List</a>

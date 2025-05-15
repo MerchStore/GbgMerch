@@ -4,15 +4,18 @@ using GbgMerch.Domain.Interfaces;
 using GbgMerch.Domain.ValueObjects;
 using GbgMerch.WebUI.ViewModels; // ✅ Se till att både EditProductViewModel och ProductViewModel finns här
 using GbgMerch.WebUI.Models;
+using GbgMerch.Infrastructure.Repositories;
 
 namespace GbgMerch.WebUI.Controllers;
 
 public class AdminController : Controller
 {
     private readonly IProductRepository _productRepository;
+    private readonly OrderRepository _orderRepository;
 
-    public AdminController(IProductRepository productRepository)
+    public AdminController(IProductRepository productRepository, OrderRepository orderRepository)
     {
+        _orderRepository = orderRepository;
         _productRepository = productRepository;
     }
 
@@ -144,11 +147,15 @@ public class AdminController : Controller
         }
     }
 
-    public IActionResult Orders()
+    [HttpGet]
+    public async Task<IActionResult> Orders()
     {
         if (!IsAdmin()) return RedirectToAction("Login", "Account");
-        return View();
+
+        var orders = await _orderRepository.GetAllAsync();
+        return View(orders);
     }
+
 
     public IActionResult Settings()
     {
@@ -178,5 +185,28 @@ public class AdminController : Controller
 
         await _productRepository.RemoveAsync(product);
         return RedirectToAction("Products");
+    }
+    [HttpPost]
+    public async Task<IActionResult> UpdateOrderStatus(string id, string newStatus)
+    {
+        if (!IsAdmin()) return RedirectToAction("Login", "Account");
+
+        var order = await _orderRepository.GetByIdAsync(id);
+        if (order == null) return NotFound();
+
+        order.Status = newStatus;
+        await _orderRepository.UpdateAsync(order); // Du behöver ha en UpdateAsync i repo
+
+        return RedirectToAction("Orders");
+    }
+    [HttpGet]
+    public async Task<IActionResult> ViewOrder(string id)
+    {
+        if (!IsAdmin()) return RedirectToAction("Login", "Account");
+
+        var order = await _orderRepository.GetByIdAsync(id);
+        if (order == null) return NotFound();
+
+        return View("ViewOrder", order);
     }
 }

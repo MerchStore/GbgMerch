@@ -15,31 +15,29 @@
     }
     else
     {
-       @foreach (var item in Model)
-    {
-        var product = item.product;
-        var quantity = item.quantity;
-        var sum = product.Price.Amount * quantity;
+        foreach (var item in Model)
+        {
+            var product = item.product;
+            var quantity = item.quantity;
+            var sum = product.Price.Amount * quantity;
+            total += sum;
+        <div class="cart-item d-flex align-items-center justify-content-between border p-3 mb-3 rounded" style="gap: 1rem;">
+            <img src="@product.ImageUrl" style="width: 100px;" />
+            <div class="flex-grow-1">
+                <h5>@product.Name</h5>
+                <p>@product.Price.Amount SEK/st</p>
 
-        <form method="post" asp-action="UpdateQuantity" asp-route-productId="@product.Id">
-            <tr class="align-middle">
-                <td><img src="@product.ImageUrl" style="width: 100px;" /></td>
-                <td>@product.Name</td>
-                <td>
-                    <div class="input-group mt-2" style="width: 150px;">
-                        <button class="btn btn-outline-secondary update-qty" data-product-id="@product.Id" data-change="-1">-</button>
-                        <input type="text" class="form-control text-center" value="@quantity" readonly />
-                        <button class="btn btn-outline-secondary update-qty" data-product-id="@product.Id" data-change="1">+</button>
-                    </div>
-
-                </td>
-                <td>@product.Price.Amount SEK</td>
-                <td>@sum SEK</td>
-            </tr>
-        </form>
-    }
-
-
+                <form method="post" asp-action="UpdateQuantity" asp-route-productId="@product.Id" class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-outline-secondary update-qty" data-product-id="@product.Id" data-change="-1">-</button>
+                    <input type="text" class="form-control text-center" value="@quantity" readonly style="width: 60px;" />
+                    <button type="button" class="btn btn-outline-secondary update-qty" data-product-id="@product.Id" data-change="1">+</button>
+                </form>
+            </div>
+            <div>
+                <strong>@sum SEK</strong>
+            </div>
+        </div>
+        }
         <h4 class="mt-4">Total: <strong>@total SEK</strong></h4>
 
         <div class="d-flex gap-3 mt-4">
@@ -55,10 +53,10 @@
             <a asp-controller="Cart" asp-action="Checkout" class="btn btn-success rounded-pill px-4">
                 <i class="bi bi-bag-check"></i> Proceed to Checkout
             </a>
-
         </div>
     }
 </div>
+
 <script>
     document.querySelectorAll('.update-qty').forEach(button => {
         button.addEventListener('click', async () => {
@@ -69,8 +67,7 @@
                 method: 'POST'
             });
 
-            location.reload(); // Ladda om för att visa nya siffror
+            location.reload(); // Uppdaterar totalsumman och kvantitet
         });
     });
 </script>
-

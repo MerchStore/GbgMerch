@@ -11,6 +11,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using GbgMerch.Application;
+using GbgMerch.Infrastructure.Repositories;
 
 BsonSerializer.RegisterSerializer(new GuidSerializer(MongoDB.Bson.GuidRepresentation.Standard));
 
@@ -22,6 +23,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddInfrastructure(builder.Configuration); // MongoDB, repos, external services
 builder.Services.AddApplication();
 builder.Services.AddSingleton<ICartService, CartService>();
+builder.Services.AddScoped<OrderRepository>();
 
 // 🧠 Session
 builder.Services.AddDistributedMemoryCache();
