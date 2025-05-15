@@ -40,4 +40,10 @@ public class MongoProductRepository : IProductRepository
     {
         await _products.DeleteOneAsync(p => p.Id == entity.Id);
     }
+    public async Task DeleteAsync(Product product)
+    {
+        await _products.DeleteOneAsync(p => p.Id == product.Id);
+
+    }
+
 }

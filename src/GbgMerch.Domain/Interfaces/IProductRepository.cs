@@ -6,4 +6,5 @@ namespace GbgMerch.Domain.Interfaces;
 public interface IProductRepository : IRepository<Product, Guid>
 {
     // Extra metodexempel kan läggas till här om nödvändigt i framtiden
+    Task DeleteAsync(Product product);
 }
