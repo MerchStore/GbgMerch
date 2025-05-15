@@ -20,7 +20,7 @@ namespace GbgMerch.WebUI.Controllers
         public IActionResult Login(string username, string password)
         {
             // Här skulle du normalt validera användarnamn och lösenord mot en databas
-            if (username == "admin" && password == "pass")
+            if (username == "admin" && password == "gbgmerch2025")
             {
                 HttpContext.Session.SetString("IsAdmin", "true");
                 // Skapa en autentiseringstoken eller session här

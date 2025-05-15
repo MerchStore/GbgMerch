@@ -1,3 +1,4 @@
+using GbgMerch.Application.DTOs;
 using GbgMerch.Domain.Entities;
 
 namespace GbgMerch.Application.Services.Interfaces;
@@ -13,7 +14,9 @@ public interface ICatalogService
     /// </summary>
     /// <returns>A collection of all products</returns>
     Task<IEnumerable<Product>> GetAllProductsAsync();
-
+    Task<Guid> CreateProductAsync(CreateProductDto dto);
+    Task<bool> UpdateProductAsync(Guid id, UpdateProductDto dto);
+    Task<bool> DeleteProductAsync(Guid id);
     /// <summary>
     /// Gets a product by its unique identifier
     /// </summary>
