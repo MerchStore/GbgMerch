@@ -23,7 +23,7 @@
                     <small>@order.CustomerEmail</small>
                 </td>
                 <td>
-                    <form asp-action="UpdateStatus" method="post" class="d-flex">
+                    <form asp-action="UpdateOrderStatus" method="post" class="d-flex">
                         <input type="hidden" name="id" value="@order.Id" />
                         <select name="newStatus" class="form-select form-select-sm me-2 bg-@GetStatusColor(order.Status)" onchange="this.form.submit()">
                             <option value="Created" selected="@(order.Status == "Created")">Created</option>
