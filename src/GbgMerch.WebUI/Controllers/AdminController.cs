@@ -72,13 +72,17 @@ public class AdminController : Controller
 
         try
         {
-            var product = new Product(
+                                var product = new Product(
                 name: model.Name,
                 description: model.Description,
                 imageUrl: string.IsNullOrWhiteSpace(model.ImageUrl) ? null : new Uri(model.ImageUrl),
                 price: Money.Create(model.PriceAmount, model.PriceCurrency),
-                stockQuantity: model.StockQuantity
+                stockQuantity: model.StockQuantity,
+                category: model.Category,
+                tags: model.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList()
             );
+
+
 
             await _productRepository.AddAsync(product);
             return RedirectToAction("Products");
@@ -100,16 +104,18 @@ public class AdminController : Controller
         var product = await _productRepository.GetByIdAsync(id);
         if (product is null) return NotFound();
 
-        var viewModel = new EditProductViewModel
-        {
-            Id = product.Id,
-            Name = product.Name,
-            Description = product.Description,
-            ImageUrl = product.ImageUrl?.ToString() ?? "",
-            PriceAmount = product.Price.Amount,
-            PriceCurrency = product.Price.Currency,
-            StockQuantity = product.StockQuantity
-        };
+                    var viewModel = new EditProductViewModel
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                ImageUrl = product.ImageUrl?.ToString() ?? "",
+                PriceAmount = product.Price.Amount,
+                PriceCurrency = product.Price.Currency,
+                StockQuantity = product.StockQuantity,
+                Category = product.Category,
+                Tags = string.Join(", ", product.Tags)
+            };
 
         return View("EditProduct", viewModel);
     }
@@ -128,7 +134,7 @@ public class AdminController : Controller
 
         try
         {
-            product.UpdateDetails(
+                    product.UpdateDetails(
                 formModel.Name,
                 formModel.Description,
                 string.IsNullOrWhiteSpace(formModel.ImageUrl) ? null : new Uri(formModel.ImageUrl)
@@ -136,6 +142,13 @@ public class AdminController : Controller
 
             product.UpdatePrice(Money.Create(formModel.PriceAmount, formModel.PriceCurrency));
             product.UpdateStock(formModel.StockQuantity);
+
+            // 🆕 Kategori och taggar
+            product.UpdateCategoryAndTags(
+                formModel.Category,
+                formModel.Tags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList()
+            );
+
 
             await _productRepository.UpdateAsync(product);
             return RedirectToAction("Products");

@@ -40,7 +40,9 @@ public class BasicProductsApiController : ControllerBase
                 Price = p.Price.Amount,
                 Currency = p.Price.Currency,
                 ImageUrl = p.ImageUrl?.ToString(),
-                StockQuantity = p.StockQuantity
+                StockQuantity = p.StockQuantity,
+                Category = p.Category,      // ✅ Lägg till detta
+                Tags = p.Tags   
             });
 
             return Ok(dtoList);
@@ -72,7 +74,9 @@ public class BasicProductsApiController : ControllerBase
                 Price = product.Price.Amount,
                 Currency = product.Price.Currency,
                 ImageUrl = product.ImageUrl?.ToString(),
-                StockQuantity = product.StockQuantity
+                StockQuantity = product.StockQuantity,
+                Category = product.Category,          // ✅ Lägg till
+                Tags = product.Tags     
             };
 
             return Ok(dto);

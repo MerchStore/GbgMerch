@@ -16,6 +16,13 @@
         <span asp-validation-for="Name" class="text-danger"></span>
     </div>
 
+    <!-- Category -->
+    <div class="col-md-6">
+        <label asp-for="Category" class="form-label">Category</label>
+        <input asp-for="Category" class="form-control" />
+        <span asp-validation-for="Category" class="text-danger"></span>
+    </div>
+
     <!-- Description -->
     <div class="col-12">
         <label asp-for="Description" class="form-label">Description</label>
@@ -42,6 +49,13 @@
         <label asp-for="StockQuantity" class="form-label">Stock</label>
         <input asp-for="StockQuantity" class="form-control" />
         <span asp-validation-for="StockQuantity" class="text-danger"></span>
+    </div>
+
+    <!-- Tags -->
+    <div class="col-md-6">
+        <label asp-for="Tags" class="form-label">Tags (comma-separated)</label>
+        <input asp-for="Tags" class="form-control" placeholder="e.g. popular, summer, limited" />
+        <span asp-validation-for="Tags" class="text-danger"></span>
     </div>
 
     <!-- Image URL -->

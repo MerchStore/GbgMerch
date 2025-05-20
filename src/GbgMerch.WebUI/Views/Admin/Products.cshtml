@@ -13,15 +13,17 @@
         </a>
     </div>
 
-    <table class="table table-striped table-bordered shadow-sm">
+    <table class="table table-striped table-bordered shadow-sm align-middle">
         <thead class="table-dark">
             <tr>
                 <th>Name</th>
+                <th>Category</th>
+                <th>Tags</th>
                 <th>Description</th>
                 <th>Price</th>
                 <th>Stock</th>
                 <th>Image</th>
-                <th>Actions</th>
+                <th style="width: 200px;">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -29,15 +31,36 @@
         {
             <tr>
                 <td>@product.Name</td>
+
+                <td>@product.Category</td>
+
+                <td>
+                    @if (product.Tags != null && product.Tags.Any())
+                    {
+                        foreach (var tag in product.Tags)
+                        {
+                            <span class="badge bg-info text-dark me-1">@tag</span>
+                        }
+                    }
+                    else
+                    {
+                        <span class="text-muted">None</span>
+                    }
+                </td>
+
                 <td>@product.Description</td>
+
                 <td>@product.Price.Amount.ToString("0.00") @product.Price.Currency</td>
+
                 <td>@product.StockQuantity</td>
+
                 <td>
                     @if (product.ImageUrl != null)
                     {
                         <img src="@product.ImageUrl" width="50" height="50" class="rounded shadow-sm" />
                     }
                 </td>
+
                 <td class="d-flex gap-2">
                     <a asp-action="ViewProduct" asp-route-id="@product.Id" class="btn btn-info">
                         <i class="bi bi-eye"></i> View

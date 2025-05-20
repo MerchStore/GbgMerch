@@ -10,4 +10,6 @@ public class BasicProductDto
     public string? ImageUrl { get; set; }
     public int StockQuantity { get; set; }
     public bool InStock => StockQuantity > 0;
+    public string Category { get; set; } = "";           
+    public List<string> Tags { get; set; } = new();       
 }
