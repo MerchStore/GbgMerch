@@ -12,8 +12,22 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using GbgMerch.Application;
 using GbgMerch.Infrastructure.Repositories;
+using GbgMerch.Domain.ValueObjects;                     // 👈 För Money
+using GbgMerch.Infrastructure.Serialization;            // 👈 Du behöver lägga din MoneySerializer här
+using GbgMerch.Domain.Entities;
 
-BsonSerializer.RegisterSerializer(new GuidSerializer(MongoDB.Bson.GuidRepresentation.Standard));
+// ✅ Registrera Guid & Money serialisering FÖRE något Mongo-anrop
+BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
+BsonSerializer.RegisterSerializer(new MoneySerializer());
+
+if (!BsonClassMap.IsClassMapRegistered(typeof(Product)))
+{
+    BsonClassMap.RegisterClassMap<Product>(cm =>
+    {
+        cm.AutoMap(); // detta hittar vår public constructor automatiskt
+        cm.SetIgnoreExtraElements(true);
+    });
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,13 +44,10 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 
 // 💳 API-key authentication
-//
 builder.Services.Configure<ApiKeySettings>(builder.Configuration.GetSection("ApiKeySettings"));
 
-// 🧠 Läs in ApiKey från appsettings.json
 var apiKeySettings = builder.Configuration.GetSection("ApiKeySettings").Get<ApiKeySettings>()
                        ?? throw new InvalidOperationException("ApiKeySettings is missing in configuration.");
-
 
 builder.Services.ConfigureOptions<ConfigureApiKeyAuthenticationOptions>();
 
@@ -47,7 +58,6 @@ builder.Services.AddAuthentication(ApiKeyAuthenticationDefaults.AuthenticationSc
             options.ApiKey = apiKeySettings.ApiKey;
             options.HeaderName = ApiKeyAuthenticationDefaults.HeaderName;
         });
-
 
 builder.Services.AddAuthorization(options =>
 {
@@ -105,17 +115,15 @@ builder.Services.AddSwaggerGen(options =>
         options.IncludeXmlComments(xmlPath);
     }
 
-    // 🔐 API-nyckel setup för Swagger UI
     options.AddSecurityDefinition(ApiKeyAuthenticationDefaults.AuthenticationScheme, new OpenApiSecurityScheme
     {
         Description = "Ange din API-nyckel i headern",
-        Name = ApiKeyAuthenticationDefaults.HeaderName, // "X-API-Key"
+        Name = ApiKeyAuthenticationDefaults.HeaderName,
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
         Scheme = ApiKeyAuthenticationDefaults.AuthenticationScheme
     });
 
-    // ✅ Lägg till detta block (DETTA visar 🔒-knappen i Swagger UI)
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -131,7 +139,6 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 
-    // 👇 Endast nödvändigt om du har en custom OperationFilter (t.ex. för kommentarer)
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
@@ -155,7 +162,7 @@ app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "GbgMerch API V1");
-    options.RoutePrefix = "swagger"; // Detta gör att /swagger fungerar
+    options.RoutePrefix = "swagger";
 });
 
 if (!app.Environment.IsDevelopment())
@@ -163,7 +170,6 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-
 
 //
 // 🧭 Middleware pipeline
@@ -176,7 +182,7 @@ app.UseCors("AllowAllOrigins");
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers(); // API
+app.MapControllers();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

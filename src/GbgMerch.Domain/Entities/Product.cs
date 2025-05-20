@@ -1,147 +1,126 @@
 using GbgMerch.Domain.Common;
 using GbgMerch.Domain.ValueObjects;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace GbgMerch.Domain.Entities;
 
+[BsonIgnoreExtraElements]
 public class Product : Entity<Guid>
 {
-    // Properties with private setters for encapsulation
     public string Name { get; private set; } = string.Empty;
     public string Description { get; private set; } = string.Empty;
     public Money Price { get; private set; } = Money.FromSEK(0);
     public int StockQuantity { get; private set; } = 0;
     public Uri? ImageUrl { get; private set; } = null;
+    public string Category { get; private set; } = string.Empty;
+    public List<string> Tags { get; private set; } = new();
 
-    
-    private Product()
+    // ✅ Används av MongoDB via BsonClassMap
+    public Product(Guid id, string name, string description, Uri? imageUrl, Money price, int stockQuantity, string category, List<string> tags)
+        : base(id)
     {
-        // Required for EF Core, but we don't want it to be used directly
-    }
-
-    // Public constructor with required parameters
-    public Product(string name, string description, Uri? imageUrl, Money price, int stockQuantity) : base(Guid.NewGuid())
-    {
-        // Validate parameters
-        if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Product name cannot be empty", nameof(name));
-
-        if (name.Length > 100)
-            throw new ArgumentException("Product name cannot exceed 100 characters", nameof(name));
-
-        if (string.IsNullOrWhiteSpace(description))
-            throw new ArgumentException("Product description cannot be empty", nameof(description));
-
-        if (description.Length > 500)
-            throw new ArgumentException("Product description cannot exceed 500 characters", nameof(description));
-
-        // Image URI validation
-        if (imageUrl != null)
-        {
-            // Validate URI scheme (only allow http and https)
-            if (imageUrl.Scheme != "http" && imageUrl.Scheme != "https")
-                throw new ArgumentException("Image URL must use HTTP or HTTPS protocol", nameof(imageUrl));
-
-            // Validate URI length - using AbsoluteUri to get the full string representation
-            if (imageUrl.AbsoluteUri.Length > 2000)
-                throw new ArgumentException("Image URL exceeds maximum length of 2000 characters", nameof(imageUrl));
-
-            // Optional: Validate file extension for images
-            string extension = Path.GetExtension(imageUrl.AbsoluteUri).ToLowerInvariant();
-            string[] validExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
-
-            if (!validExtensions.Contains(extension))
-                throw new ArgumentException("Image URL must point to a valid image file (jpg, jpeg, png, gif, webp)", nameof(imageUrl));
-        }
-
-        if (price is null)
-            throw new ArgumentNullException(nameof(price));
-
-        if (stockQuantity < 0)
-            throw new ArgumentException("Stock quantity cannot be negative", nameof(stockQuantity));
-
-        // Set properties
         Name = name;
         Description = description;
         ImageUrl = imageUrl;
         Price = price;
         StockQuantity = stockQuantity;
+        Category = category;
+        Tags = tags;
     }
 
-    // Domain methods that encapsulate business logic
-    public void UpdateDetails(string name, string description, Uri? imageUrl)
+    // ✅ Används när man skapar nya produkter via UI eller API
+    public Product(string name, string description, Uri? imageUrl, Money price, int stockQuantity, string category, List<string> tags)
+        : base(Guid.NewGuid())
     {
-        // Validate name with clear domain rules
-        if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Name cannot be empty", nameof(name));
-
-        if (name.Length > 100)
-            throw new ArgumentException("Name cannot exceed 100 characters", nameof(name));
-
-        // Validate description with clear domain rules
-        if (string.IsNullOrWhiteSpace(description))
-            throw new ArgumentException("Description cannot be empty", nameof(description));
-
-        if (description.Length > 500)
-            throw new ArgumentException("Description cannot exceed 500 characters", nameof(description));
-
-        // Image URI validation
+        // Validering
+        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Product name cannot be empty", nameof(name));
+        if (name.Length > 100) throw new ArgumentException("Product name cannot exceed 100 characters", nameof(name));
+        if (string.IsNullOrWhiteSpace(description)) throw new ArgumentException("Product description cannot be empty", nameof(description));
+        if (description.Length > 500) throw new ArgumentException("Product description cannot exceed 500 characters", nameof(description));
         if (imageUrl != null)
         {
-            // Validate URI scheme (only allow http and https)
             if (imageUrl.Scheme != "http" && imageUrl.Scheme != "https")
-                throw new ArgumentException("Image URL must use HTTP or HTTPS protocol", nameof(imageUrl));
-
-            // Validate URI length - using AbsoluteUri to get the full string representation
+                throw new ArgumentException("Image URL must use HTTP or HTTPS", nameof(imageUrl));
             if (imageUrl.AbsoluteUri.Length > 2000)
-                throw new ArgumentException("Image URL exceeds maximum length of 2000 characters", nameof(imageUrl));
-
-            // Optional: Validate file extension for images
+                throw new ArgumentException("Image URL exceeds maximum length", nameof(imageUrl));
             string extension = Path.GetExtension(imageUrl.AbsoluteUri).ToLowerInvariant();
-            string[] validExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
-
-            if (!validExtensions.Contains(extension))
-                throw new ArgumentException("Image URL must point to a valid image file (jpg, jpeg, png, gif, webp)", nameof(imageUrl));
+            if (!new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" }.Contains(extension))
+                throw new ArgumentException("Image URL must point to a valid image file", nameof(imageUrl));
         }
+        if (price == null) throw new ArgumentNullException(nameof(price));
+        if (stockQuantity < 0) throw new ArgumentException("Stock quantity cannot be negative", nameof(stockQuantity));
+        if (string.IsNullOrWhiteSpace(category)) throw new ArgumentException("Category cannot be empty", nameof(category));
+        if (tags == null) throw new ArgumentNullException(nameof(tags));
+        if (tags.Count > 10) throw new ArgumentException("Too many tags. Maximum is 10.", nameof(tags));
 
-        // Update properties after all validation passes
         Name = name;
         Description = description;
-        ImageUrl = imageUrl;  // Assuming the property name has been updated to imageUrl
+        ImageUrl = imageUrl;
+        Price = price;
+        StockQuantity = stockQuantity;
+        Category = category;
+        Tags = tags;
+    }
+
+    // För EF Core (och Mongo om den inte använder BsonClassMap)
+    private Product() { }
+
+    public void UpdateDetails(string name, string description, Uri? imageUrl)
+    {
+        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Name cannot be empty", nameof(name));
+        if (name.Length > 100) throw new ArgumentException("Name cannot exceed 100 characters", nameof(name));
+        if (string.IsNullOrWhiteSpace(description)) throw new ArgumentException("Description cannot be empty", nameof(description));
+        if (description.Length > 500) throw new ArgumentException("Description cannot exceed 500 characters", nameof(description));
+
+        if (imageUrl != null)
+        {
+            if (imageUrl.Scheme != "http" && imageUrl.Scheme != "https")
+                throw new ArgumentException("Image URL must use HTTP or HTTPS", nameof(imageUrl));
+            if (imageUrl.AbsoluteUri.Length > 2000)
+                throw new ArgumentException("Image URL exceeds maximum length", nameof(imageUrl));
+            string extension = Path.GetExtension(imageUrl.AbsoluteUri).ToLowerInvariant();
+            if (!new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" }.Contains(extension))
+                throw new ArgumentException("Image URL must point to a valid image file", nameof(imageUrl));
+        }
+
+        Name = name;
+        Description = description;
+        ImageUrl = imageUrl;
+    }
+
+    public void UpdateCategoryAndTags(string category, List<string> tags)
+    {
+        if (string.IsNullOrWhiteSpace(category)) throw new ArgumentException("Category cannot be empty", nameof(category));
+        if (tags == null) throw new ArgumentNullException(nameof(tags));
+        if (tags.Count > 10) throw new ArgumentException("Too many tags. Maximum is 10.", nameof(tags));
+
+        Category = category;
+        Tags = tags;
     }
 
     public void UpdatePrice(Money newPrice)
     {
         ArgumentNullException.ThrowIfNull(newPrice);
-
         Price = newPrice;
     }
 
     public void UpdateStock(int quantity)
     {
-        if (quantity < 0)
-            throw new ArgumentException("Stock quantity cannot be negative", nameof(quantity));
-
+        if (quantity < 0) throw new ArgumentException("Stock quantity cannot be negative", nameof(quantity));
         StockQuantity = quantity;
     }
 
-
     public bool DecrementStock(int quantity = 1)
     {
-        if (quantity <= 0)
-            throw new ArgumentException("Quantity must be positive", nameof(quantity));
-
-        if (StockQuantity < quantity)
-            return false; // Not enough stock
-
+        if (quantity <= 0) throw new ArgumentException("Quantity must be positive", nameof(quantity));
+        if (StockQuantity < quantity) return false;
         StockQuantity -= quantity;
         return true;
     }
 
     public void IncrementStock(int quantity)
     {
-        if (quantity <= 0)
-            throw new ArgumentException("Quantity must be positive", nameof(quantity));
-
+        if (quantity <= 0) throw new ArgumentException("Quantity must be positive", nameof(quantity));
         StockQuantity += quantity;
     }
 }

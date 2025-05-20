@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using GbgMerch.Application.DTOs;
 using GbgMerch.Domain.Entities;
 using GbgMerch.Domain.Interfaces;
@@ -15,7 +14,6 @@ public class ProductService : IProductService
         _repository = repository;
     }
 
-    // Hämta alla produkter
     public async Task<List<ProductDto>> GetAllAsync()
     {
         var products = await _repository.GetAllAsync();
@@ -28,11 +26,12 @@ public class ProductService : IProductService
             Price = p.Price.Amount,
             Currency = p.Price.Currency,
             ImageUrl = p.ImageUrl?.ToString() ?? "",
-            StockQuantity = p.StockQuantity
+            StockQuantity = p.StockQuantity,
+            Category = p.Category,
+            Tags = p.Tags
         }).ToList();
     }
 
-    // Hämta produkt med ID
     public async Task<ProductDto?> GetByIdAsync(Guid id)
     {
         var product = await _repository.GetByIdAsync(id);
@@ -46,11 +45,12 @@ public class ProductService : IProductService
             Price = product.Price.Amount,
             Currency = product.Price.Currency,
             ImageUrl = product.ImageUrl?.ToString() ?? "",
-            StockQuantity = product.StockQuantity
+            StockQuantity = product.StockQuantity,
+            Category = product.Category,
+            Tags = product.Tags
         };
     }
 
-    // Lägg till ny produkt
     public async Task AddAsync(ProductDto dto)
     {
         var price = new Money(dto.Price, dto.Currency);
@@ -61,27 +61,32 @@ public class ProductService : IProductService
             description: dto.Description,
             imageUrl: imageUrl,
             price: price,
-            stockQuantity: dto.StockQuantity
+            stockQuantity: dto.StockQuantity,
+            category: dto.Category,
+            tags: dto.Tags ?? new List<string>()
         );
 
         await _repository.AddAsync(product);
     }
 
-    // Uppdatera produkt
     public async Task UpdateAsync(ProductDto dto)
     {
         var product = await _repository.GetByIdAsync(dto.Id);
         if (product is null) return;
 
-        product.UpdateDetails(dto.Name, dto.Description,
-            string.IsNullOrWhiteSpace(dto.ImageUrl) ? null : new Uri(dto.ImageUrl));
+        product.UpdateDetails(
+            dto.Name,
+            dto.Description,
+            string.IsNullOrWhiteSpace(dto.ImageUrl) ? null : new Uri(dto.ImageUrl)
+        );
+
         product.UpdatePrice(new Money(dto.Price, dto.Currency));
         product.UpdateStock(dto.StockQuantity);
+        product.UpdateCategoryAndTags(dto.Category, dto.Tags ?? new List<string>());
 
         await _repository.UpdateAsync(product);
     }
 
-    // Ta bort produkt
     public async Task DeleteAsync(Guid id)
     {
         var product = await _repository.GetByIdAsync(id);

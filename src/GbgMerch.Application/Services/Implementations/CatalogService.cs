@@ -61,7 +61,9 @@ public class CatalogService : ICatalogService
         description: dto.Description,
         imageUrl: string.IsNullOrWhiteSpace(dto.ImageUrl) ? null : new Uri(dto.ImageUrl),
         price: new Money(dto.Price, dto.Currency),
-        stockQuantity: dto.StockQuantity
+        stockQuantity: dto.StockQuantity,
+        category: "Default", // eller något du har tillgängligt i kontexten
+        tags: new List<string> ()
         );
 
         await _productRepository.AddAsync(product);

@@ -10,4 +10,6 @@ public class ProductDto
     public string Currency { get; set; } = "SEK"; // Valuta (från Money)
     public string ImageUrl { get; set; } = "";    // URL som sträng (från Uri)
     public int StockQuantity { get; set; }   // Antal i lager
+    public string Category { get; set; } = "";     // 🆕 Kategori
+    public List<string> Tags { get; set; } = new(); // 🆕 Lista av taggar
 }

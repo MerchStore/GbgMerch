@@ -20,6 +20,24 @@
                     <dt class="col-sm-4">Description</dt>
                     <dd class="col-sm-8">@Model.Description</dd>
 
+                    <dt class="col-sm-4">Category</dt>
+                    <dd class="col-sm-8">@Model.Category</dd>
+
+                    <dt class="col-sm-4">Tags</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.Tags != null && Model.Tags.Any())
+                        {
+                            foreach (var tag in Model.Tags)
+                            {
+                                <span class="badge bg-secondary me-1">@tag</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-muted">No tags</span>
+                        }
+                    </dd>
+
                     <dt class="col-sm-4">Price</dt>
                     <dd class="col-sm-8">@Model.Price.Amount.ToString("0.00") @Model.Price.Currency</dd>
 

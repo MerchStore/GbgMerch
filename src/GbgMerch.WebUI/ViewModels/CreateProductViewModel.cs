@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace GbgMerch.WebUI.ViewModels;
@@ -20,4 +21,10 @@ public class CreateProductViewModel
     public int StockQuantity { get; set; }
 
     public string? ImageUrl { get; set; }
+
+    [Required]
+    [StringLength(50)]
+    public string Category { get; set; } = string.Empty;
+
+    public string Tags { get; set; } = string.Empty; // komma-separerad string (t.ex. "cool,limited,summer")
 }
