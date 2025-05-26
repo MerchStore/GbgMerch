@@ -1,28 +1,41 @@
 using Microsoft.AspNetCore.Mvc;
 using GbgMerch.Application.Services.Interfaces;
 using GbgMerch.WebUI.Models.Catalog;
+using GbgMerch.Application.Services.Interfaces;
+
 
 namespace GbgMerch.WebUI.Controllers;
 
 public class CatalogController : Controller
 {
     private readonly ICatalogService _catalogService;
+    private readonly IReviewService _reviewService;
 
-    public CatalogController(ICatalogService catalogService)
+    public CatalogController(ICatalogService catalogService, IReviewService reviewService)
     {
         _catalogService = catalogService;
+        _reviewService = reviewService;
     }
+
 
     // GET: Catalog
     public async Task<IActionResult> Index()
+{
+    try
     {
-        try
-        {
-            // Get all products from the service
-            var products = await _catalogService.GetAllProductsAsync();
+        // 1. Hämta produkter från catalogService
+        var products = await _catalogService.GetAllProductsAsync();
 
-            // Map domain entities to view models
-            var productViewModels = products.Select(p => new ProductCardViewModel
+        // 🟡 Här börjar vi skapa ViewModel-listan
+        var productViewModels = new List<ProductCardViewModel>();
+
+        // 2. För varje produkt – hämta betyg & antal reviews via ReviewService
+        foreach (var p in products)
+        {
+            var rating = await _reviewService.GetAverageRatingForProductAsync(p.Id);
+            var count = await _reviewService.GetReviewCountForProductAsync(p.Id);
+
+            productViewModels.Add(new ProductCardViewModel
             {
                 Id = p.Id,
                 Name = p.Name,
@@ -32,28 +45,28 @@ public class CatalogController : Controller
                 FormattedPrice = p.Price.ToString(),
                 PriceAmount = p.Price.Amount,
                 ImageUrl = p.ImageUrl?.ToString(),
-                StockQuantity = p.StockQuantity
-            }).ToList();
-
-            // Create the product catalog view model
-            var viewModel = new ProductCatalogViewModel
-            {
-                FeaturedProducts = productViewModels
-            };
-
-            return View(viewModel);
+                StockQuantity = p.StockQuantity,
+                AverageRating = rating,        // ✅ Här läggs in
+                ReviewCount = count            // ✅ Här läggs in
+            });
         }
-        catch (Exception ex)
+
+        // 3. Skapa huvud-vymodellen med alla produktkort
+        var viewModel = new ProductCatalogViewModel
         {
-            // Log the exception
-            // In a real application, you should use a proper logging framework
-            Console.WriteLine($"Error in ProductCatalog: {ex.Message}");
+            FeaturedProducts = productViewModels
+        };
 
-            // Show an error message to the user
-            ViewBag.ErrorMessage = "An error occurred while loading products. Please try again later.";
-            return View("Error");
-        }
+        return View(viewModel);
     }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error in ProductCatalog: {ex.Message}");
+        ViewBag.ErrorMessage = "An error occurred while loading products. Please try again later.";
+        return View("Error");
+    }
+}
+
 
     // GET: Store/Details/5
     public async Task<IActionResult> Details(Guid id)
