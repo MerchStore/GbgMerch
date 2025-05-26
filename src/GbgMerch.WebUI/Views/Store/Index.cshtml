@@ -1,4 +1,4 @@
-@model List<GbgMerch.Domain.Entities.Product>
+@model List<GbgMerch.WebUI.Models.StoreProductViewModel>
 
 @{
     ViewData["Title"] = "Store";
@@ -12,16 +12,46 @@
 <h2 class="text-2xl font-bold mb-4">Featured Products</h2>
 
 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-    @foreach (var product in Model)
+    @foreach (var item in Model)
     {
+        var product = item.Product;
+
         <div class="col">
             <div class="card h-100 shadow-sm">
                 <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name" />
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">@product.Name</h5>
                     <p class="card-text">@product.Description</p>
-                    <p class="fw-bold">SEK @product.Price</p>
+                    <p class="fw-bold">SEK @product.Price.Amount @product.Price.Currency</p>
                     <p class="text-success">In Stock: @product.StockQuantity</p>
+
+                    <!-- ⭐ Stjärnor + betyg -->
+                    @if (item.ReviewCount > 0)
+                    {
+                        <div class="mb-2">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                if (i <= Math.Floor(item.AverageRating))
+                                {
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                }
+                                else if (i == Math.Ceiling(item.AverageRating) && item.AverageRating % 1 >= 0.5)
+                                {
+                                    <i class="bi bi-star-half text-warning"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-star text-warning"></i>
+                                }
+                            }
+                            <span class="ms-1">@item.AverageRating.ToString("F1")</span><br />
+                            <small class="text-muted">@item.ReviewCount review@(item.ReviewCount == 1 ? "" : "s")</small>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-2">No reviews yet</p>
+                    }
 
                     <div class="mt-auto d-flex gap-2 justify-content-center">
                         <!-- View Details -->
@@ -65,7 +95,6 @@
             if (response.ok) {
                 alert('Product has been added to the cart!');
 
-                // Hämta cart count från servern
                 const countResponse = await fetch('/Cart/GetCartCount');
                 if (countResponse.ok) {
                     const count = await countResponse.json();

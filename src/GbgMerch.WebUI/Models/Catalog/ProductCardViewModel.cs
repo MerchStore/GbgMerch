@@ -11,4 +11,7 @@ public class ProductCardViewModel
     public bool HasImage => !string.IsNullOrEmpty(ImageUrl);
     public bool InStock => StockQuantity > 0;
     public int StockQuantity { get; set; }
+    public double AverageRating { get; set; } = 0.0;
+   public int ReviewCount { get; set; } = 0;
+
 }

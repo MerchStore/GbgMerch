@@ -15,6 +15,8 @@ using GbgMerch.Infrastructure.Repositories;
 using GbgMerch.Domain.ValueObjects;                     // 👈 För Money
 using GbgMerch.Infrastructure.Serialization;            // 👈 Du behöver lägga din MoneySerializer här
 using GbgMerch.Domain.Entities;
+using GbgMerch.WebUI.Models;
+
 
 // ✅ Registrera Guid & Money serialisering FÖRE något Mongo-anrop
 BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
@@ -89,6 +91,8 @@ builder.Services.AddControllersWithViews()
         options.JsonSerializerOptions.DictionaryKeyPolicy = new JsonSnakeCaseNamingPolicy();
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
+builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
+
 
 //
 // 📘 Swagger
