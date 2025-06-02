@@ -1,0 +1,10 @@
+@{
+    ViewData["Title"] = "Order Confirmation";
+}
+
+<div class="container mt-5">
+    <h2>Order Received!</h2>
+    <p>@TempData["OrderMessage"]</p>
+
+    <a asp-controller="Store" asp-action="Index" class="btn btn-primary mt-3">Back to Store</a>
+</div>

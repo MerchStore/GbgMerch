@@ -1,0 +1,81 @@
+@model GbgMerch.WebUI.ViewModels.CreateProductViewModel
+
+@{
+    ViewData["Title"] = "Create Product";
+}
+
+<h2 class="mt-4">➕ Create New Product</h2>
+
+<form asp-action="Create" method="post" class="row g-3">
+    @Html.AntiForgeryToken()
+
+    <!-- Name -->
+    <div class="col-md-6">
+        <label asp-for="Name" class="form-label">Product Name</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <!-- Category -->
+    <div class="col-md-6">
+        <label asp-for="Category" class="form-label">Category</label>
+        <input asp-for="Category" class="form-control" />
+        <span asp-validation-for="Category" class="text-danger"></span>
+    </div>
+
+    <!-- Description -->
+    <div class="col-12">
+        <label asp-for="Description" class="form-label">Description</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <!-- Price -->
+    <div class="col-md-3">
+        <label asp-for="PriceAmount" class="form-label">Price</label>
+        <input asp-for="PriceAmount" class="form-control" step="0.01" />
+        <span asp-validation-for="PriceAmount" class="text-danger"></span>
+    </div>
+
+    <!-- Currency -->
+    <div class="col-md-3">
+        <label asp-for="PriceCurrency" class="form-label">Currency</label>
+        <input asp-for="PriceCurrency" class="form-control" />
+        <span asp-validation-for="PriceCurrency" class="text-danger"></span>
+    </div>
+
+    <!-- Stock -->
+    <div class="col-md-3">
+        <label asp-for="StockQuantity" class="form-label">Stock</label>
+        <input asp-for="StockQuantity" class="form-control" />
+        <span asp-validation-for="StockQuantity" class="text-danger"></span>
+    </div>
+
+    <!-- Tags -->
+    <div class="col-md-6">
+        <label asp-for="Tags" class="form-label">Tags (comma-separated)</label>
+        <input asp-for="Tags" class="form-control" placeholder="e.g. popular, summer, limited" />
+        <span asp-validation-for="Tags" class="text-danger"></span>
+    </div>
+
+    <!-- Image URL -->
+    <div class="col-md-6">
+        <label asp-for="ImageUrl" class="form-label">Image URL</label>
+        <input asp-for="ImageUrl" class="form-control" />
+        <span asp-validation-for="ImageUrl" class="text-danger"></span>
+    </div>
+
+    <!-- Submit -->
+    <div class="col-12 d-flex gap-2">
+        <button type="submit" class="btn btn-success">
+            <i class="bi bi-save"></i> Create Product
+        </button>
+        <a asp-action="Products" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
+</form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

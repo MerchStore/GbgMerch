@@ -1,0 +1,52 @@
+@model GbgMerch.WebUI.Models.ContactFormModel
+
+@{
+    ViewData["Title"] = "Kontakta oss";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow p-4">
+                <h2 class="mb-3">Kontakta oss</h2>
+                <p class="text-muted mb-4">
+                    Har du frågor eller funderingar? Fyll i formuläret nedan så återkommer vi så snart som möjligt.
+                </p>
+
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success mt-3" role="alert">
+                        <i class="bi bi-check-circle-fill"></i> @TempData["Success"]
+                    </div>
+                }
+
+
+                <form asp-action="Index" method="post">
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label">Namn</label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label">E-post</label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Message" class="form-label">Meddelande</label>
+                        <textarea asp-for="Message" class="form-control" rows="5"></textarea>
+                        <span asp-validation-for="Message" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary px-4">Skicka</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
